@@ -1,0 +1,186 @@
+# English messages for CrysisShot plugin
+# Use MiniMessage format: https://docs.advntr.dev/minimessage/format.html
+
+messages:
+  # Game messages
+  game:
+    join-success: "<green>You joined the game queue!"
+    join-failed: "<red>Cannot join game: {reason}"
+    leave-success: "<yellow>You left the game!"
+    already-in-game: "<red>You are already in a game!"
+    game-starting: "<yellow>Game starting in <gold>{seconds}</gold> seconds!"
+    game-started: "<green><bold>GAME STARTED!</bold> Good luck!"
+    game-ended: "<gold><bold>GAME OVER!</bold>"
+    game-won: "<gold>{winner}</gold> <yellow>wins with</yellow> <green>{score}</green> <yellow>points!"
+    respawn-countdown: "<yellow>Respawning in <gold>{seconds}</gold> seconds..."
+    spectator-mode: "<gray>You are now spectating the game"
+    
+    # Kill messages
+    kill-bow: "<yellow>{killer}</yellow> <gray>shot</gray> <red>{victim}</red> <gray>with precision!"
+    kill-sword: "<yellow>{killer}</yellow> <gray>eliminated</gray> <red>{victim}</red> <gray>in melee combat!"
+    kill-first-blood: "<red><bold>FIRST BLOOD!</bold></red> <yellow>{killer}</yellow> <gray>drew first blood!"
+    kill-headshot: "<gold><bold>HEADSHOT!</bold></gold> <yellow>{killer}</yellow> <gray>got a perfect shot!"
+    
+    # Combo messages
+    combo-achieved: "<gold><bold>COMBO!</bold></gold> <yellow>{player}</yellow> <gray>is on a</gray> <gold>{streak}</gold> <gray>kill streak!"
+    combo-broken: "<red>Kill streak broken!</red> <yellow>{killer}</yellow> <gray>stopped</gray> <red>{victim}</red><gray>'s streak!"
+    combo-unstoppable: "<red><bold>UNSTOPPABLE!</bold></red> <yellow>{player}</yellow> <gray>has</gray> <red>{streak}</red> <gray>kills!"
+    
+    # Arrow management
+    arrows-remaining: "<yellow>Arrows: <gold>{count}</gold>"
+    no-arrows: "<red>No arrows! Use your sword to get more!"
+    arrow-recovered: "<green>+1 Arrow!"
+    
+    # Queue system
+    queue-joined: "<green>Joined queue! Position: <gold>{position}</gold>"
+    queue-left: "<yellow>Left the queue"
+    queue-position: "<yellow>Queue position: <gold>{position}</gold>"
+    
+  # Power-up messages
+  powerups:
+    collected: "<green>You collected: <white>{powerup}</white>"
+    expired: "<gray>Power-up expired: <white>{powerup}</white>"
+    
+    # Power-up names
+    extra-arrow: "<yellow>Extra Arrow"
+    score-multiplier: "<gold>Score Multiplier x5"
+    speed-boost: "<aqua>Speed Boost"
+    stealth-mode: "<dark_gray>Stealth Mode"
+    shield-perk: "<gray>Arrow Shield"
+    
+    # Power-up effects
+    speed-activated: "<aqua>Speed boost activated!"
+    stealth-activated: "<dark_gray>Stealth mode activated!"
+    shield-activated: "<gray>Arrow shield activated!"
+    shield-used: "<yellow>Your shield protected you from an arrow!"
+    multiplier-activated: "<gold>Next kill worth 5x points!"
+    
+  # Ranking messages
+  ranks:
+    promotion: "<green>Rank up! You are now <white>{rank}</white>"
+    demotion: "<red>Rank down! You are now <white>{rank}</white>"
+    deadeye-achieved: "<red><bold>DEADEYE RANK ACHIEVED!</bold></red> <yellow>You are now the top player!"
+    deadeye-lost: "<red>You lost the Deadeye rank to <yellow>{player}</yellow>!"
+    
+    # Rank names
+    novato: "<gray>Novato"
+    letal: "<red>Letal"
+    veterano: "<gold>Veterano"
+    deadeye: "<dark_red><bold>Deadeye</bold></dark_red>"
+    
+  # Arena messages
+  arena:
+    selected: "<yellow>Arena selected: <gold>{arena}</gold>"
+    not-found: "<red>Arena not found: {arena}"
+    loading: "<yellow>Loading arena: <gold>{arena}</gold>..."
+    loaded: "<green>Arena loaded successfully!"
+    
+    # Setup messages
+    setup:
+      started: "<green>Arena setup mode started for: <yellow>{arena}</yellow>"
+      cancelled: "<red>Arena setup cancelled"
+      saved: "<green>Arena <yellow>{arena}</yellow> saved successfully!"
+      lobby-set: "<green>Lobby spawn point set!"
+      spectator-set: "<green>Spectator spawn point set!"
+      spawn-added: "<green>Spawn point added! Total: <yellow>{count}</yellow>"
+      spawn-removed: "<red>Spawn point removed! Total: <yellow>{count}</yellow>"
+      powerup-added: "<green>Power-up location added! Total: <yellow>{count}</yellow>"
+      powerup-removed: "<red>Power-up location removed! Total: <yellow>{count}</yellow>"
+      bounds-set: "<green>Arena boundaries set!"
+      theme-set: "<green>Arena theme set to: <yellow>{theme}</yellow>"
+      validation-passed: "<green>Arena validation passed!"
+      validation-failed: "<red>Arena validation failed: {errors}"
+      
+  # Statistics messages
+  stats:
+    header: "<gold><bold>--- {player}'s Statistics ---</bold></gold>"
+    total-kills: "<yellow>Total Kills: <white>{kills}</white>"
+    bow-kills: "<yellow>Bow Kills: <white>{kills}</white>"
+    sword-kills: "<yellow>Sword Kills: <white>{kills}</white>"
+    games-played: "<yellow>Games Played: <white>{games}</white>"
+    games-won: "<yellow>Games Won: <white>{wins}</white>"
+    win-rate: "<yellow>Win Rate: <white>{rate}%</white>"
+    current-rank: "<yellow>Current Rank: {rank}"
+    best-streak: "<yellow>Best Kill Streak: <white>{streak}</white>"
+    
+  # Leaderboard messages
+  leaderboard:
+    header: "<gold><bold>--- Top Players ---</bold></gold>"
+    entry: "<yellow>{position}.</yellow> {rank} <white>{player}</white> <gray>-</gray> <green>{score}</green>"
+    footer: "<gray>Page {current}/{total}"
+    
+  # Command messages
+  commands:
+    no-permission: "<red>You don't have permission to use this command!"
+    player-not-found: "<red>Player not found: <yellow>{player}</yellow>"
+    invalid-args: "<red>Invalid arguments! Use: <yellow>{usage}</yellow>"
+    reload-success: "<green>Configuration reloaded successfully!"
+    player-only: "<red>This command can only be used by players!"
+    console-only: "<red>This command can only be used from console!"
+    language-changed: "<green>Language changed to: <yellow>{language}</yellow>"
+    
+    # Help messages
+    help:
+      header: "<gold><bold>--- CrysisShot Commands ---</bold></gold>"
+      join: "<yellow>/cs join</yellow> <gray>- Join a game"
+      leave: "<yellow>/cs leave</yellow> <gray>- Leave current game"
+      stats: "<yellow>/cs stats [player]</yellow> <gray>- View statistics"
+      leaderboard: "<yellow>/cs top</yellow> <gray>- View leaderboard"
+      language: "<yellow>/cs lang <language></yellow> <gray>- Change language"
+      
+    # Admin help
+    admin-help:
+      header: "<gold><bold>--- Admin Commands ---</bold></gold>"
+      create: "<yellow>/cs admin create <name></yellow> <gray>- Create new arena"
+      delete: "<yellow>/cs admin delete <arena></yellow> <gray>- Delete arena"
+      enable: "<yellow>/cs admin enable <arena></yellow> <gray>- Enable arena"
+      disable: "<yellow>/cs admin disable <arena></yellow> <gray>- Disable arena"
+      reload: "<yellow>/cs admin reload</yellow> <gray>- Reload plugin"
+      forcestart: "<yellow>/cs admin start</yellow> <gray>- Force start game"
+      
+  # Error messages
+  errors:
+    general: "<red>An error occurred. Please try again later."
+    database: "<red>Database error. Please contact an administrator."
+    arena-not-found: "<red>Arena not found: <yellow>{arena}</yellow>"
+    insufficient-players: "<red>Need at least <yellow>{min}</yellow> players to start"
+    game-full: "<red>Game is full (<yellow>{current}/{max}</yellow>)"
+    already-in-game: "<red>You are already in a game"
+    not-in-game: "<red>You are not in a game"
+    game-not-found: "<red>Game not found"
+    invalid-language: "<red>Invalid language: <yellow>{language}</yellow>"
+    no-games-available: "<red>No games available to join"
+    cooldown-active: "<red>Please wait <yellow>{seconds}</yellow> seconds before using this command again"
+    operation-failed: "<red>Operation failed. Please try again."
+    
+    # Setup errors
+    setup-not-active: "<red>You are not in setup mode"
+    setup-already-active: "<red>Already in setup mode for arena: <yellow>{arena}</yellow>"
+    invalid-selection: "<red>Invalid selection. Please select an area with WorldEdit first."
+    spawn-too-close: "<red>Spawn point too close to existing spawn (<yellow>{distance}</yellow> blocks)"
+    max-spawns-reached: "<red>Maximum spawn points reached (<yellow>{max}</yellow>)"
+    
+  # Scoreboard messages
+  scoreboard:
+    title: "<gold><bold>CrysisShot</bold></gold>"
+    game-mode: "<yellow>One in the Chamber"
+    players: "<white>Players: <green>{current}</green>/<green>{max}</green>"
+    time-left: "<white>Time: <yellow>{time}</yellow>"
+    your-score: "<white>Score: <green>{score}</green>"
+    leader: "<white>Leader: <yellow>{player}</yellow> <green>({score})</green>"
+    arrows: "<white>Arrows: <yellow>{count}</yellow>"
+    rank: "<white>Rank: {rank}"
+    
+  # Economy messages (if Vault is enabled)
+  economy:
+    reward-received: "<green>+${amount} for {reason}!"
+    insufficient-funds: "<red>Insufficient funds! Need ${amount}"
+    entry-fee-paid: "<yellow>Entry fee paid: <green>${amount}</green>"
+    
+  # Notification messages
+  notifications:
+    player-joined: "<yellow>{player}</yellow> <gray>joined the game"
+    player-left: "<yellow>{player}</yellow> <gray>left the game"
+    spectator-joined: "<gray>{player} is now spectating"
+    game-starting-soon: "<yellow>Game starting in <gold>30</gold> seconds!"
+    waiting-for-players: "<yellow>Waiting for more players... (<white>{current}</white>/<white>{min}</white>)"

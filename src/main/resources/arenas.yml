@@ -1,0 +1,119 @@
+# CrysisShot Arenas Configuration
+# Define your custom arenas here
+
+arenas:
+  # Example arena configuration
+  example_urban:
+    # Display name for the arena
+    display-name: "&6Urban Warfare"
+    
+    # World name where the arena is located
+    world: "crysisshot_urban"
+    
+    # Whether this arena is enabled
+    enabled: false
+    
+    # Arena theme (URBAN, HOSPITAL, TEMPLE)
+    theme: "URBAN"
+    
+    # Minimum players for this arena
+    min-players: 4
+    
+    # Maximum players for this arena
+    max-players: 16
+    
+    # Lobby spawn point (where players wait)
+    lobby-spawn:
+      x: 0.5
+      y: 64.0
+      z: 0.5
+      yaw: 0.0
+      pitch: 0.0
+    
+    # Spectator spawn point (where spectators watch)
+    spectator-spawn:
+      x: 0.5
+      y: 80.0
+      z: 0.5
+      yaw: 0.0
+      pitch: 90.0
+    
+    # Player spawn points for the game
+    spawn-points:
+      - {x: 10.5, y: 64.0, z: 10.5, yaw: 45.0, pitch: 0.0}
+      - {x: -10.5, y: 64.0, z: -10.5, yaw: 225.0, pitch: 0.0}
+      - {x: 10.5, y: 64.0, z: -10.5, yaw: 135.0, pitch: 0.0}
+      - {x: -10.5, y: 64.0, z: 10.5, yaw: 315.0, pitch: 0.0}
+      - {x: 0.5, y: 64.0, z: 15.5, yaw: 180.0, pitch: 0.0}
+      - {x: 0.5, y: 64.0, z: -15.5, yaw: 0.0, pitch: 0.0}
+      - {x: 15.5, y: 64.0, z: 0.5, yaw: 270.0, pitch: 0.0}
+      - {x: -15.5, y: 64.0, z: 0.5, yaw: 90.0, pitch: 0.0}
+    
+    # Power-up spawn locations
+    powerup-locations:
+      - {x: 5.5, y: 65.0, z: 0.5}
+      - {x: -5.5, y: 65.0, z: 0.5}
+      - {x: 0.5, y: 65.0, z: 5.5}
+      - {x: 0.5, y: 65.0, z: -5.5}
+      - {x: 8.5, y: 65.0, z: 8.5}
+      - {x: -8.5, y: 65.0, z: -8.5}
+    
+    # Arena boundaries (bounding box)
+    boundaries:
+      min: {x: -50, y: 0, z: -50}
+      max: {x: 50, y: 100, z: 50}
+    
+    # Arena-specific settings (optional)
+    settings:
+      # Custom target score for this arena
+      target-score: 20
+      
+      # Custom power-up spawn interval
+      powerup-interval: 30
+      
+      # Arena description
+      description: "A desolate urban battlefield with strategic cover points"
+
+# Arena creation templates
+# These are used when creating new arenas with /cs admin create
+templates:
+  small:
+    min-players: 4
+    max-players: 8
+    spawn-points-required: 8
+    recommended-size: "30x30"
+    
+  medium:
+    min-players: 6
+    max-players: 12
+    spawn-points-required: 12
+    recommended-size: "50x50"
+    
+  large:
+    min-players: 8
+    max-players: 16
+    spawn-points-required: 16
+    recommended-size: "80x80"
+
+# Arena validation settings
+validation:
+  # Minimum distance between spawn points
+  min-spawn-distance: 5.0
+  
+  # Maximum distance between spawn points
+  max-spawn-distance: 100.0
+  
+  # Minimum height for spawn points
+  min-spawn-height: 50
+  
+  # Maximum height for spawn points
+  max-spawn-height: 120
+  
+  # Require lobby spawn
+  require-lobby-spawn: true
+  
+  # Require spectator spawn
+  require-spectator-spawn: true
+  
+  # Minimum power-up locations
+  min-powerup-locations: 3

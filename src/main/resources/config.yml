@@ -1,0 +1,176 @@
+# CrysisShot Plugin Configuration
+# Competitive PvP minigame - One In The Chamber
+
+# Game Settings
+game:
+  # Points needed to win a game
+  target-score: 20
+  
+  # Maximum players per game
+  max-players: 16
+  
+  # Minimum players to start a game
+  min-players: 4
+  
+  # Respawn delay in seconds after death
+  respawn-delay: 3
+  
+  # Kill streak thresholds for combo multipliers
+  combo-thresholds: [3, 6]
+  
+  # Multipliers for combo kills
+  combo-multipliers: [2, 3]
+  
+  # Game countdown timer in seconds
+  countdown-duration: 10
+  
+  # Maximum game duration in minutes (0 = no limit)
+  max-duration: 15
+
+# Power-up Settings
+powerups:
+  # Enable/disable power-ups
+  enabled: true
+  
+  # Time between power-up spawns in seconds
+  spawn-interval: 30
+  
+  # Maximum power-ups active at once
+  max-active: 3
+  
+  # Power-up effect durations in seconds
+  duration:
+    speed: 10
+    invisibility: 7
+    shield: 0  # Permanent until used
+    
+  # Power-up spawn chances (percentage)
+  spawn-chances:
+    extra-arrow: 30
+    score-multiplier: 15
+    speed-boost: 25
+    stealth-mode: 20
+    shield-perk: 10
+
+# Arena Settings
+arenas:
+  # Arena selection mode: random, vote, sequential
+  selection-mode: "random"
+  
+  # Voting duration in seconds (if vote mode)
+  vote-duration: 15
+  
+  # Enable arena rotation
+  rotation-enabled: true
+
+# Locale Settings
+locale:
+  # Default language for messages
+  default-language: "en"
+  
+  # Supported languages
+  supported-languages: ["en", "es", "fr", "de"]
+  
+  # Auto-detect player language from client
+  auto-detect: true
+
+# Database Settings
+database:
+  # Database type: sqlite, mysql
+  type: "sqlite"
+  
+  # SQLite file name (for sqlite)
+  file: "crysisshot.db"
+  
+  # MySQL settings (if using mysql)
+  mysql:
+    host: "localhost"
+    port: 3306
+    database: "crysisshot"
+    username: "username"
+    password: "password"
+    ssl: false
+    
+  # Connection pool settings
+  pool:
+    maximum-pool-size: 10
+    minimum-idle: 2
+    connection-timeout: 30000
+
+# Economy Settings (requires Vault)
+economy:
+  # Enable economy integration
+  enabled: true
+  
+  # Rewards for different achievements
+  rewards:
+    win: 100.0
+    kill: 10.0
+    combo-kill: 25.0
+    first-blood: 50.0
+    
+  # Entry fee to join games (0 = free)
+  entry-fee: 0.0
+
+# Ranking Settings
+ranking:
+  # Enable ranking system
+  enabled: true
+  
+  # Bow kills required for each rank
+  rank-thresholds:
+    letal: 50
+    veterano: 200
+    
+  # Deadeye rank (top player globally)
+  deadeye-enabled: true
+
+# Statistics Settings
+statistics:
+  # Enable detailed statistics tracking
+  enabled: true
+  
+  # Save statistics to file for analysis
+  save-to-file: true
+  
+  # Statistics file format: json, csv
+  file-format: "json"
+
+# Performance Settings
+performance:
+  # Enable async database operations
+  async-database: true
+  
+  # Update interval for scoreboards (ticks)
+  scoreboard-update-interval: 20
+  
+  # Cleanup interval for old games (minutes)
+  cleanup-interval: 60
+
+# Integration Settings
+integrations:
+  # PlaceholderAPI settings
+  placeholderapi:
+    enabled: true
+    
+  # Vault economy settings
+  vault:
+    enabled: true
+    
+  # WorldEdit integration for arena setup
+  worldedit:
+    enabled: true
+
+# Debug Settings
+debug:
+  # Enable debug mode
+  enabled: false
+  
+  # Debug categories to log
+  categories:
+    - "game-events"
+    - "player-actions"
+    - "database-operations"
+    
+  # Save debug logs to file
+  save-logs: true

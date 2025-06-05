@@ -1,0 +1,98 @@
+name: CrysisShot
+version: '${project.version}'
+main: com.crysisshot.CrysisShot
+api-version: '1.20'
+prefix: CrysisShot
+authors: [AI-Developer]
+description: Competitive PvP minigame plugin - One In The Chamber mode
+website: https://github.com/yourusername/CrysisShot
+
+depend: []
+softdepend: [PlaceholderAPI, Vault, WorldEdit]
+
+permissions:
+  crysisshot.*:
+    description: All CrysisShot permissions
+    default: op
+    children:
+      crysisshot.play: true
+      crysisshot.admin: true
+      crysisshot.vip: true
+  
+  crysisshot.play:
+    description: Basic play permissions
+    default: true
+    children:
+      crysisshot.join: true
+      crysisshot.leave: true
+      crysisshot.stats: true
+      crysisshot.leaderboard: true
+  
+  crysisshot.vip:
+    description: VIP player permissions
+    default: false
+    children:
+      crysisshot.play: true
+      crysisshot.priority: true
+      crysisshot.spectate: true
+  
+  crysisshot.admin:
+    description: Administrative permissions
+    default: op
+    children:
+      crysisshot.play: true
+      crysisshot.vip: true
+      crysisshot.admin.arena: true
+      crysisshot.admin.game: true
+      crysisshot.admin.config: true
+      crysisshot.admin.stats: true
+  
+  crysisshot.join:
+    description: Join games
+    default: true
+  
+  crysisshot.leave:
+    description: Leave games
+    default: true
+  
+  crysisshot.stats:
+    description: View statistics
+    default: true
+  
+  crysisshot.leaderboard:
+    description: View leaderboards
+    default: true
+  
+  crysisshot.priority:
+    description: Priority queue access
+    default: false
+  
+  crysisshot.spectate:
+    description: Spectate games
+    default: false
+  
+  crysisshot.admin.arena:
+    description: Arena management
+    default: op
+  
+  crysisshot.admin.game:
+    description: Game management
+    default: op
+  
+  crysisshot.admin.config:
+    description: Configuration management
+    default: op
+  
+  crysisshot.admin.stats:
+    description: Statistics management
+    default: op
+
+commands:
+  crysisshot:
+    aliases: [cs]
+    description: Main CrysisShot command
+    usage: |
+      /<command> [subcommand]
+      Use /<command> help for more information
+    permission: crysisshot.play
+    permission-message: "§cYou don't have permission to use CrysisShot commands!"
