@@ -43,9 +43,12 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
                   case "join":
                 handleJoin(sender);
                 break;
-                
-            case "leave":
+                  case "leave":
                 handleLeave(sender);
+                break;
+                
+            case "queue":
+                handleQueue(sender, args);
                 break;
                 
             case "stats":
@@ -161,6 +164,56 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             messageManager.sendMessage(player, "game.left-successfully");
         } else {
             messageManager.sendMessage(player, "error.leave-failed");
+        }
+    }
+    
+    private void handleQueue(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("This command can only be used by players!");
+            return;
+        }
+        
+        Player player = (Player) sender;
+        
+        if (!player.hasPermission("crysisshot.queue")) {
+            messageManager.sendMessage(player, "commands.no-permission");
+            return;
+        }
+        
+        // Default to "join" if no subcommand provided
+        String action = (args.length > 1) ? args[1].toLowerCase() : "join";
+        
+        switch (action) {
+            case "join":
+                if (gameManager.addPlayerToQueue(player)) {
+                    int position = gameManager.getQueuePosition(player);
+                    messageManager.sendMessage(player, "game.queue-joined", "position", String.valueOf(position));
+                }
+                break;
+                
+            case "leave":
+                if (gameManager.removePlayerFromQueue(player)) {
+                    messageManager.sendMessage(player, "game.queue-left");
+                } else {
+                    messageManager.sendMessage(player, "error.not-in-queue");
+                }
+                break;
+                
+            case "status":
+                if (gameManager.isPlayerInQueue(player)) {
+                    int position = gameManager.getQueuePosition(player);
+                    int size = gameManager.getQueueSize();
+                    messageManager.sendMessage(player, "game.queue-position", 
+                        "position", String.valueOf(position), 
+                        "total", String.valueOf(size));
+                } else {
+                    messageManager.sendMessage(player, "error.not-in-queue");
+                }
+                break;
+                
+            default:
+                messageManager.sendMessage(player, "commands.queue.usage");
+                break;
         }
     }
     

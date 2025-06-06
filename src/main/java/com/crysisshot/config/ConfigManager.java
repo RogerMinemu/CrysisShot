@@ -287,4 +287,13 @@ public class ConfigManager {
     public boolean isDebugMode() {
         return config.getBoolean("debug.enabled", false);
     }
+    
+    // Session-specific methods for matchmaking
+    public int getMinPlayersPerSession() {
+        return getMinPlayers();
+    }
+    
+    public int getMaxPlayersPerSession() {
+        return getMaxPlayers();
+    }
 }

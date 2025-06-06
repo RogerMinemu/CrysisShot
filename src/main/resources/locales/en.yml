@@ -114,41 +114,43 @@ messages:
   error:
     session-not-found: "<red>Game session not found!"
     already-in-game: "<red>You are already in a game!"
-    not-in-game: "<red>You are not currently in a game!"
-    join-failed: "<red>Failed to join the game!"
-    leave-failed: "<red>Failed to leave the game!"
+    already-in-queue: "<red>You are already in the queue!"
+    not-in-game: "<red>You are not in a game!"
+    not-in-queue: "<red>You are not in the queue!"
     game-full: "<red>This game is full!"
-    game-in-progress: "<red>Game is already in progress!"
+    permission-denied: "<red>You don't have permission to do that!"
+    player-not-found: "<red>Player not found!"
+    leave-failed: "<red>Failed to leave the game!"
     
-  # Command messages
+  # Success messages
+  success:
+    joined-queue: "<green>Joined the matchmaking queue!"
+    joined-game: "<green>Successfully joined the game!"
+    left-game: "<yellow>You left the game!"
+    match-found: "<green>Match found! Joining game..."
+    
+  # Info messages
+  info:
+    left-queue: "<yellow>You left the queue"
+    
+  # Commands
   commands:
-    no-permission: "<red>You don't have permission to use this command!"
-    player-not-found: "<red>Player not found: <yellow>{player}</yellow>"
-    invalid-args: "<red>Invalid arguments! Use: <yellow>{usage}</yellow>"
-    reload-success: "<green>Configuration reloaded successfully!"
-    player-only: "<red>This command can only be used by players!"
-    console-only: "<red>This command can only be used from console!"
-    language-changed: "<green>Language changed to: <yellow>{language}</yellow>"
-    
-    # Help messages
     help:
-      header: "<gold><bold>--- CrysisShot Commands ---</bold></gold>"
-      join: "<yellow>/cs join</yellow> <gray>- Join a game"
-      leave: "<yellow>/cs leave</yellow> <gray>- Leave current game"
-      stats: "<yellow>/cs stats [player]</yellow> <gray>- View statistics"
-      leaderboard: "<yellow>/cs top</yellow> <gray>- View leaderboard"
-      language: "<yellow>/cs lang <language></yellow> <gray>- Change language"
+      header: "<yellow>----- <gold>CrysisShot Commands</gold> -----"
+      join: "<gray>/cs join</gray> - Join a game"
+      leave: "<gray>/cs leave</gray> - Leave current game"
+      queue: "<gray>/cs queue [join|leave|status]</gray> - Manage queue"
+      stats: "<gray>/cs stats [player]</gray> - View player statistics"
+      leaderboard: "<gray>/cs top</gray> - View leaderboard"
+      language: "<gray>/cs lang <language></gray> - Change language"
+      admin: "<gray>/cs admin</gray> - Admin commands"
       
-    # Admin help
-    admin-help:
-      header: "<gold><bold>--- Admin Commands ---</bold></gold>"
-      create: "<yellow>/cs admin create <name></yellow> <gray>- Create new arena"
-      delete: "<yellow>/cs admin delete <arena></yellow> <gray>- Delete arena"
-      enable: "<yellow>/cs admin enable <arena></yellow> <gray>- Enable arena"
-      disable: "<yellow>/cs admin disable <arena></yellow> <gray>- Disable arena"
-      reload: "<yellow>/cs admin reload</yellow> <gray>- Reload plugin"
-      forcestart: "<yellow>/cs admin start</yellow> <gray>- Force start game"
-      
+    no-permission: "<red>You don't have permission to use this command!"
+    invalid-args: "<red>Invalid arguments! Usage: {usage}"
+    
+    queue:
+      usage: "<yellow>Usage: /cs queue [join|leave|status]"
+    
   # Error messages
   errors:
     general: "<red>An error occurred. Please try again later."

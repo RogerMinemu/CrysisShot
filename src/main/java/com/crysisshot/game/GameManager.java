@@ -14,10 +14,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Manages all game sessions and player interactions
@@ -39,6 +38,12 @@ public class GameManager {
     // Player restoration data (for when they leave games)
     private final Map<UUID, PlayerRestoreData> restoreData = new ConcurrentHashMap<>();
     
+    // Matchmaking and queue system
+    private final Queue<UUID> matchmakingQueue = new ConcurrentLinkedQueue<>();
+    private final Map<UUID, Long> queueTimestamps = new ConcurrentHashMap<>();
+    private final Set<UUID> playersInQueue = ConcurrentHashMap.newKeySet();
+    private BukkitTask matchmakingTask;
+    
     // Cleanup task
     private BukkitTask cleanupTask;
     
@@ -48,6 +53,7 @@ public class GameManager {
         this.messageManager = plugin.getMessageManager();
         
         startCleanupTask();
+        startMatchmakingTask();
         Logger.info("GameManager initialized successfully");
     }
     
@@ -62,11 +68,21 @@ public class GameManager {
             cleanupTask.cancel();
         }
         
+        // Stop matchmaking task
+        if (matchmakingTask != null) {
+            matchmakingTask.cancel();
+        }
+        
         // End all active sessions
         for (GameSession session : sessions.values()) {
             session.endGame("Plugin shutting down");
         }
         sessions.clear();
+        
+        // Clear queue
+        matchmakingQueue.clear();
+        queueTimestamps.clear();
+        playersInQueue.clear();
         
         // Restore all active players
         for (UUID playerId : activePlayers.keySet()) {
@@ -120,7 +136,229 @@ public class GameManager {
     public Map<String, GameSession> getAllSessions() {
         return new HashMap<>(sessions);
     }
-      /**
+    
+    // ===========================================
+    // MATCHMAKING AND QUEUE SYSTEM
+    // ===========================================
+    
+    /**
+     * Add a player to the matchmaking queue
+     */
+    public boolean addPlayerToQueue(Player player) {
+        UUID playerId = player.getUniqueId();
+        
+        // Check if player is already in game or queue
+        if (isPlayerInGame(player)) {
+            messageManager.sendMessage(player, "error.already-in-game");
+            return false;
+        }
+        
+        if (playersInQueue.contains(playerId)) {
+            messageManager.sendMessage(player, "error.already-in-queue");
+            return false;
+        }
+        
+        // Add to queue
+        matchmakingQueue.offer(playerId);
+        queueTimestamps.put(playerId, System.currentTimeMillis());
+        playersInQueue.add(playerId);
+        
+        messageManager.sendMessage(player, "success.joined-queue");
+        Logger.info("Player " + player.getName() + " joined matchmaking queue");
+        
+        return true;
+    }
+    
+    /**
+     * Remove a player from the matchmaking queue
+     */
+    public boolean removePlayerFromQueue(Player player) {
+        UUID playerId = player.getUniqueId();
+        
+        if (!playersInQueue.contains(playerId)) {
+            return false;
+        }
+        
+        matchmakingQueue.remove(playerId);
+        queueTimestamps.remove(playerId);
+        playersInQueue.remove(playerId);
+        
+        messageManager.sendMessage(player, "info.left-queue");
+        return true;
+    }
+    
+    /**
+     * Check if player is in queue
+     */
+    public boolean isPlayerInQueue(Player player) {
+        return playersInQueue.contains(player.getUniqueId());
+    }
+    
+    /**
+     * Get queue position for a player (1-based)
+     */
+    public int getQueuePosition(Player player) {
+        UUID playerId = player.getUniqueId();
+        if (!playersInQueue.contains(playerId)) {
+            return -1;
+        }
+        
+        int position = 1;
+        for (UUID queuedPlayerId : matchmakingQueue) {
+            if (queuedPlayerId.equals(playerId)) {
+                return position;
+            }
+            position++;
+        }
+        return -1;
+    }
+    
+    /**
+     * Get current queue size
+     */
+    public int getQueueSize() {
+        return matchmakingQueue.size();
+    }
+    
+    /**
+     * Start the matchmaking task that processes the queue
+     */
+    private void startMatchmakingTask() {
+        matchmakingTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                processMatchmakingQueue();
+            }
+        }.runTaskTimer(plugin, 20L, 20L); // Run every second
+    }
+    
+    /**
+     * Process the matchmaking queue and create games when possible
+     */
+    private void processMatchmakingQueue() {
+        if (matchmakingQueue.size() < plugin.getConfigManager().getMinPlayersPerSession()) {
+            return;
+        }
+        
+        // Check for available sessions that need players
+        GameSession availableSession = findAvailableSession();
+        
+        if (availableSession == null) {
+            // Create new session if we have enough players
+            int maxPlayersPerSession = plugin.getConfigManager().getMaxPlayersPerSession();
+            if (matchmakingQueue.size() >= plugin.getConfigManager().getMinPlayersPerSession()) {
+                availableSession = createNewMatchmakingSession();
+            }
+        }
+        
+        if (availableSession != null) {
+            // Fill the session with queued players
+            fillSessionFromQueue(availableSession);
+        }
+    }
+    
+    /**
+     * Find an existing session that can accept more players
+     */
+    private GameSession findAvailableSession() {
+        for (GameSession session : sessions.values()) {
+            if (session.getCurrentState() == GameSession.GameState.WAITING && 
+                session.canAcceptPlayers()) {
+                return session;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Create a new session for matchmaking
+     */
+    private GameSession createNewMatchmakingSession() {
+        String sessionId = "match_" + System.currentTimeMillis();
+        // TODO: Select arena based on config or rotation
+        return createSession(sessionId, "DefaultArena");
+    }
+    
+    /**
+     * Fill a session with players from the queue
+     */
+    private void fillSessionFromQueue(GameSession session) {
+        int maxPlayers = session.getMaxPlayers();
+        int currentPlayers = session.getPlayerCount();
+        int playersNeeded = maxPlayers - currentPlayers;
+        
+        List<UUID> playersToAdd = new ArrayList<>();
+        
+        // Take players from queue
+        for (int i = 0; i < playersNeeded && !matchmakingQueue.isEmpty(); i++) {
+            UUID playerId = matchmakingQueue.poll();
+            if (playerId != null) {
+                Player player = Bukkit.getPlayer(playerId);
+                if (player != null && player.isOnline()) {
+                    playersToAdd.add(playerId);
+                } else {
+                    // Clean up offline player from queue
+                    queueTimestamps.remove(playerId);
+                    playersInQueue.remove(playerId);
+                }
+            }
+        }
+        
+        // Add players to session
+        for (UUID playerId : playersToAdd) {
+            Player player = Bukkit.getPlayer(playerId);
+            if (player != null) {
+                // Remove from queue tracking
+                queueTimestamps.remove(playerId);
+                playersInQueue.remove(playerId);
+                
+                // Add to session
+                if (addPlayerToSession(player, session)) {
+                    messageManager.sendMessage(player, "success.match-found");
+                } else {
+                    // If failed to add, put back in queue
+                    matchmakingQueue.offer(playerId);
+                    queueTimestamps.put(playerId, System.currentTimeMillis());
+                    playersInQueue.add(playerId);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Add a player directly to a specific session (internal method)
+     */
+    private boolean addPlayerToSession(Player player, GameSession session) {
+        UUID playerId = player.getUniqueId();
+        
+        // Check if player is already in a game
+        if (isPlayerInGame(player)) {
+            return false;
+        }
+        
+        // Store player state for restoration
+        storePlayerState(player);
+          // Create GamePlayer instance
+        GamePlayer gamePlayer = new GamePlayer(player);
+        activePlayers.put(playerId, gamePlayer);
+        playerSessions.put(playerId, session.getSessionId());
+        
+        // Add to session
+        boolean success = session.addPlayer(player);
+        
+        if (!success) {
+            // Cleanup if failed
+            activePlayers.remove(playerId);
+            playerSessions.remove(playerId);
+            restorePlayerState(player);
+            return false;
+        }
+        
+        Logger.info("Player " + player.getName() + " added to session " + session.getSessionId());
+        return true;
+    }
+    
+    /**
      * Add a player to a game session
      */
     public boolean addPlayerToGame(Player player, String sessionId) {
@@ -271,8 +509,7 @@ public class GameManager {
             Logger.severe("Failed to update player stats for " + gamePlayer.getPlayerName() + ": " + e.getMessage());
         }
     }
-    
-    /**
+      /**
      * Start the cleanup task for inactive sessions
      */
     private void startCleanupTask() {
@@ -282,15 +519,16 @@ public class GameManager {
                 cleanupInactiveSessions();
             }
         }.runTaskTimer(plugin, 20 * 60, 20 * 60); // Run every minute
-    }    /**
+    }
+    
+    /**
      * Clean up inactive sessions
      */
     private void cleanupInactiveSessions() {
         // Clean up empty waiting sessions
         sessions.entrySet().removeIf(entry -> {
             GameSession session = entry.getValue();
-            // TODO: Add session creation time tracking in Step 2.2
-            // For now, clean up sessions based on state and activity
+            // Clean up sessions based on state and activity
             if (session.getCurrentState() == GameSession.GameState.WAITING && 
                 session.getPlayerCount() == 0) {
                 

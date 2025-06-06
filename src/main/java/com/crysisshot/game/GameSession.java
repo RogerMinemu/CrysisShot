@@ -24,6 +24,7 @@ public class GameSession {
     private final CrysisShot plugin;
     private final ConfigManager configManager;
     private final MessageManager messageManager;
+    private final String arenaName;
     
     // Game state
     private GameState currentState;
@@ -45,7 +46,6 @@ public class GameSession {
     private int countdownSeconds;
     
     // Arena information
-    private String arenaName;
     private Location lobbyLocation;
     private List<Location> powerupSpawnLocations;
     
@@ -494,8 +494,7 @@ public class GameSession {
     public void setLobbyLocation(Location location) {
         this.lobbyLocation = location.clone();
     }
-    
-    /**
+      /**
      * Add power-up spawn location
      */
     public void addPowerupSpawnLocation(Location location) {
@@ -503,22 +502,9 @@ public class GameSession {
     }
     
     /**
-     * Cleanup method for proper resource management
+     * Check if the session can accept more players
      */
-    public void cleanup() {
-        // Cancel any running tasks
-        if (gameTask != null) {
-            gameTask.cancel();
-        }
-        if (countdownTask != null) {
-            countdownTask.cancel();
-        }
-        
-        // Restore all players
-        for (GamePlayer gamePlayer : players.values()) {
-            gamePlayer.restoreOriginalState();
-        }
-        
-        Logger.info("Cleaned up game session " + sessionId);
+    public boolean canAcceptPlayers() {
+        return currentState == GameState.WAITING && players.size() < maxPlayers;
     }
 }
