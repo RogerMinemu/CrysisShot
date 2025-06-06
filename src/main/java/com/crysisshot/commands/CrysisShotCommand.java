@@ -1,8 +1,7 @@
 package com.crysisshot.commands;
 
 import com.crysisshot.CrysisShot;
-// TODO: Implement in Step 2.1 when GameManager is available
-// import com.crysisshot.game.GameManager;
+import com.crysisshot.game.GameManager;
 import com.crysisshot.localization.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,16 +17,13 @@ import java.util.List;
  * Main command handler for CrysisShot plugin
  */
 public class CrysisShotCommand implements CommandExecutor, TabCompleter {
-    
-    private final CrysisShot plugin;
-    // TODO: Implement in Step 2.1 when GameManager is available
-    // private final GameManager gameManager;
+      private final CrysisShot plugin;
+    private final GameManager gameManager;
     private final MessageManager messageManager;
     
-    public CrysisShotCommand(CrysisShot plugin, MessageManager messageManager) {
+    public CrysisShotCommand(CrysisShot plugin, MessageManager messageManager, GameManager gameManager) {
         this.plugin = plugin;
-        // TODO: Update in Step 2.1 when GameManager is available
-        // this.gameManager = gameManager;
+        this.gameManager = gameManager;
         this.messageManager = messageManager;
     }
     
@@ -111,8 +107,7 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("§e/cs admin reload §7- Reload plugin");
             sender.sendMessage("§e/cs version §7- Show plugin version");
         }
-    }
-      private void handleJoin(CommandSender sender) {
+    }    private void handleJoin(CommandSender sender) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("This command can only be used by players!");
             return;
@@ -125,11 +120,25 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             return;
         }
         
-        // TODO: Implement game joining logic in Step 2.1 when GameManager is available
-        messageManager.sendMessage(player, "game.join-feature-coming-soon");
+        // Check if player is already in a game
+        if (gameManager.isPlayerInGame(player)) {
+            messageManager.sendMessage(player, "error.already-in-game");
+            return;
+        }
+        
+        // For now, try to join a default session or create one
+        String sessionId = "default";
+        if (gameManager.getSession(sessionId) == null) {
+            gameManager.createSession(sessionId, "default-arena");
+        }
+        
+        if (gameManager.addPlayerToGame(player, sessionId)) {
+            messageManager.sendMessage(player, "game.joined-successfully");
+        } else {
+            messageManager.sendMessage(player, "error.join-failed");
+        }
     }
-    
-    private void handleLeave(CommandSender sender) {
+      private void handleLeave(CommandSender sender) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("This command can only be used by players!");
             return;
@@ -142,8 +151,17 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             return;
         }
         
-        // TODO: Implement game leaving logic in Step 2.1 when GameManager is available
-        messageManager.sendMessage(player, "game.leave-feature-coming-soon");
+        // Check if player is in a game
+        if (!gameManager.isPlayerInGame(player)) {
+            messageManager.sendMessage(player, "error.not-in-game");
+            return;
+        }
+        
+        if (gameManager.removePlayerFromGame(player, true)) {
+            messageManager.sendMessage(player, "game.left-successfully");
+        } else {
+            messageManager.sendMessage(player, "error.leave-failed");
+        }
     }
     
     private void handleStats(CommandSender sender, String[] args) {

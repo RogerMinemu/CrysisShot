@@ -3,8 +3,8 @@ package com.crysisshot;
 import com.crysisshot.commands.CrysisShotCommand;
 import com.crysisshot.config.ConfigManager;
 import com.crysisshot.database.DatabaseManager;
+import com.crysisshot.game.GameManager;
 // TODO: Uncomment when implemented in later steps
-// import com.crysisshot.game.GameManager;
 // import com.crysisshot.integration.EconomyManager;
 // import com.crysisshot.integration.PlaceholderExpansion;
 // import com.crysisshot.listeners.GameListener;
@@ -23,13 +23,11 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class CrysisShot extends JavaPlugin {
     
-    private static CrysisShot instance;
-      // Core managers
+    private static CrysisShot instance;      // Core managers
     private ConfigManager configManager;
     private MessageManager messageManager;
     private DatabaseManager databaseManager;
-    // TODO: Add when implemented in later steps
-    // private GameManager gameManager;
+    private GameManager gameManager;
     // private EconomyManager economyManager;
     
     // Plugin state
@@ -73,12 +71,10 @@ public class CrysisShot extends JavaPlugin {
         try {
             pluginEnabled = false;
             
-            Logger.info("Disabling CrysisShot plugin...");
-              // End all active games
-            // TODO: Uncomment when GameManager is implemented
-            // if (gameManager != null) {
-            //     gameManager.shutdown();
-            // }
+            Logger.info("Disabling CrysisShot plugin...");            // End all active games
+            if (gameManager != null) {
+                gameManager.shutdown();
+            }
             
             // Close database connections
             if (databaseManager != null) {
@@ -110,27 +106,23 @@ public class CrysisShot extends JavaPlugin {
         
         // Message manager (depends on config)
         messageManager = new MessageManager(this, configManager);
-        messageManager.loadMessages();
-          // Database manager
+        messageManager.loadMessages();        // Database manager
         databaseManager = new DatabaseManager(this);
         if (!databaseManager.initialize()) {
             throw new RuntimeException("Failed to initialize database");
         }
         
-        // TODO: Game manager (depends on database and config) - Implement in Step 2.1
-        // gameManager = new GameManager(this, databaseManager, messageManager, configManager);
-        // gameManager.initialize();
+        // Game manager (depends on database and config)
+        gameManager = new GameManager(this);
         
         Logger.info("All managers initialized successfully!");
-    }
-      /**
+    }    /**
      * Register plugin commands
      */
     private void registerCommands() {
         Logger.info("Registering commands...");
         
-        // TODO: Update in Step 2.1 when GameManager is implemented
-        CrysisShotCommand mainCommand = new CrysisShotCommand(this, messageManager);
+        CrysisShotCommand mainCommand = new CrysisShotCommand(this, messageManager, gameManager);
         getCommand("crysisshot").setExecutor(mainCommand);
         getCommand("crysisshot").setTabCompleter(mainCommand);
         
@@ -198,7 +190,9 @@ public class CrysisShot extends JavaPlugin {
         }
     }
     
-    // Getters for managers
+    /**
+     * Get plugin instance
+     */
     public static CrysisShot getInstance() {
         return instance;
     }
@@ -214,10 +208,12 @@ public class CrysisShot extends JavaPlugin {
         return databaseManager;
     }
     
-    // TODO: Implement in Step 2.1 when GameManager is available
-    // public GameManager getGameManager() {
-    //     return gameManager;
-    // }
+    /**
+     * Get the game manager
+     */
+    public GameManager getGameManager() {
+        return gameManager;
+    }
     
     // TODO: Implement in Step 7.1 when EconomyManager is available
     // public EconomyManager getEconomyManager() {

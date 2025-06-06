@@ -6,6 +6,8 @@ messages:
   game:
     join-success: "<green>You joined the game queue!"
     join-failed: "<red>Cannot join game: {reason}"
+    joined-successfully: "<green>Successfully joined the game!"
+    left-successfully: "<yellow>You left the game!"
     leave-success: "<yellow>You left the game!"
     already-in-game: "<red>You are already in a game!"
     game-starting: "<yellow>Game starting in <gold>{seconds}</gold> seconds!"
@@ -105,9 +107,18 @@ messages:
     
   # Leaderboard messages
   leaderboard:
-    header: "<gold><bold>--- Top Players ---</bold></gold>"
-    entry: "<yellow>{position}.</yellow> {rank} <white>{player}</white> <gray>-</gray> <green>{score}</green>"
+    header: "<gold><bold>--- Top Players ---</bold></gold>"    entry: "<yellow>{position}.</yellow> {rank} <white>{player}</white> <gray>-</gray> <green>{score}</green>"
     footer: "<gray>Page {current}/{total}"
+    
+  # Error messages
+  error:
+    session-not-found: "<red>Game session not found!"
+    already-in-game: "<red>You are already in a game!"
+    not-in-game: "<red>You are not currently in a game!"
+    join-failed: "<red>Failed to join the game!"
+    leave-failed: "<red>Failed to leave the game!"
+    game-full: "<red>This game is full!"
+    game-in-progress: "<red>Game is already in progress!"
     
   # Command messages
   commands:
