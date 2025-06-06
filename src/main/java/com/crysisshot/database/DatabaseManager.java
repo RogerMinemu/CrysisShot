@@ -215,11 +215,10 @@ public class DatabaseManager {
     public CompletableFuture<List<PlayerStats>> getTopPlayers(String orderBy, int limit) {
         return CompletableFuture.supplyAsync(() -> {
             List<PlayerStats> topPlayers = new ArrayList<>();
-            
-            // Validate orderBy parameter to prevent SQL injection
+              // Validate orderBy parameter to prevent SQL injection
             String validOrderBy = validateOrderByColumn(orderBy);
             if (validOrderBy == null) {
-                Logger.error("Invalid orderBy parameter: " + orderBy);
+                Logger.severe("Invalid orderBy parameter: " + orderBy);
                 return topPlayers;
             }
             
@@ -234,10 +233,8 @@ public class DatabaseManager {
                     while (rs.next()) {
                         topPlayers.add(mapResultSetToPlayerStats(rs));
                     }
-                }
-                
-            } catch (SQLException e) {
-                Logger.error("Failed to get top players: " + e.getMessage());
+                }                } catch (SQLException e) {
+                Logger.severe("Failed to get top players: " + e.getMessage());
             }
             
             return topPlayers;

@@ -3,11 +3,12 @@ package com.crysisshot;
 import com.crysisshot.commands.CrysisShotCommand;
 import com.crysisshot.config.ConfigManager;
 import com.crysisshot.database.DatabaseManager;
-import com.crysisshot.game.GameManager;
-import com.crysisshot.integration.EconomyManager;
-import com.crysisshot.integration.PlaceholderExpansion;
-import com.crysisshot.listeners.GameListener;
-import com.crysisshot.listeners.PlayerListener;
+// TODO: Uncomment when implemented in later steps
+// import com.crysisshot.game.GameManager;
+// import com.crysisshot.integration.EconomyManager;
+// import com.crysisshot.integration.PlaceholderExpansion;
+// import com.crysisshot.listeners.GameListener;
+// import com.crysisshot.listeners.PlayerListener;
 import com.crysisshot.localization.MessageManager;
 import com.crysisshot.utils.Logger;
 import org.bukkit.Bukkit;
@@ -23,15 +24,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class CrysisShot extends JavaPlugin {
     
     private static CrysisShot instance;
-    
-    // Core managers
+      // Core managers
     private ConfigManager configManager;
     private MessageManager messageManager;
     private DatabaseManager databaseManager;
-    private GameManager gameManager;
-    
-    // Integration managers
-    private EconomyManager economyManager;
+    // TODO: Add when implemented in later steps
+    // private GameManager gameManager;
+    // private EconomyManager economyManager;
     
     // Plugin state
     private boolean pluginEnabled = false;
@@ -57,10 +56,10 @@ public class CrysisShot extends JavaPlugin {
             
             // Mark plugin as enabled
             pluginEnabled = true;
-            
-            Logger.info("CrysisShot plugin has been enabled successfully!");
-            Logger.info("Version: " + getDescription().getVersion());
-            Logger.info("Authors: " + String.join(", ", getDescription().getAuthors()));
+              Logger.info("CrysisShot plugin has been enabled successfully!");
+            // Use PluginMeta instead of deprecated getDescription()
+            Logger.info("Version: " + getPluginMeta().getVersion());
+            Logger.info("Authors: " + String.join(", ", getPluginMeta().getAuthors()));
             
         } catch (Exception e) {
             Logger.severe("Failed to enable CrysisShot plugin: " + e.getMessage());
@@ -75,11 +74,11 @@ public class CrysisShot extends JavaPlugin {
             pluginEnabled = false;
             
             Logger.info("Disabling CrysisShot plugin...");
-            
-            // End all active games
-            if (gameManager != null) {
-                gameManager.shutdown();
-            }
+              // End all active games
+            // TODO: Uncomment when GameManager is implemented
+            // if (gameManager != null) {
+            //     gameManager.shutdown();
+            // }
             
             // Close database connections
             if (databaseManager != null) {
@@ -112,71 +111,71 @@ public class CrysisShot extends JavaPlugin {
         // Message manager (depends on config)
         messageManager = new MessageManager(this, configManager);
         messageManager.loadMessages();
+          // Database manager
+        databaseManager = new DatabaseManager(this);
+        if (!databaseManager.initialize()) {
+            throw new RuntimeException("Failed to initialize database");
+        }
         
-        // Database manager
-        databaseManager = new DatabaseManager(this, configManager);
-        databaseManager.initialize();
-        
-        // Game manager (depends on database and config)
-        gameManager = new GameManager(this, databaseManager, messageManager, configManager);
-        gameManager.initialize();
+        // TODO: Game manager (depends on database and config) - Implement in Step 2.1
+        // gameManager = new GameManager(this, databaseManager, messageManager, configManager);
+        // gameManager.initialize();
         
         Logger.info("All managers initialized successfully!");
     }
-    
-    /**
+      /**
      * Register plugin commands
      */
     private void registerCommands() {
         Logger.info("Registering commands...");
         
-        CrysisShotCommand mainCommand = new CrysisShotCommand(this, gameManager, messageManager);
+        // TODO: Update in Step 2.1 when GameManager is implemented
+        CrysisShotCommand mainCommand = new CrysisShotCommand(this, messageManager);
         getCommand("crysisshot").setExecutor(mainCommand);
         getCommand("crysisshot").setTabCompleter(mainCommand);
         
         Logger.info("Commands registered successfully!");
     }
-    
-    /**
+      /**
      * Register event listeners
      */
     private void registerEvents() {
         Logger.info("Registering event listeners...");
         
-        Bukkit.getPluginManager().registerEvents(
-            new PlayerListener(gameManager, messageManager), this);
-        Bukkit.getPluginManager().registerEvents(
-            new GameListener(gameManager, messageManager), this);
+        // TODO: Implement in Step 2.1 when GameManager and listeners are implemented
+        // Bukkit.getPluginManager().registerEvents(
+        //     new PlayerListener(gameManager, messageManager), this);
+        // Bukkit.getPluginManager().registerEvents(
+        //     new GameListener(gameManager, messageManager), this);
         
-        Logger.info("Event listeners registered successfully!");
+        Logger.info("Event listeners will be registered in Step 2.1!");
     }
-    
-    /**
+      /**
      * Setup external plugin integrations
      */
     private void setupIntegrations() {
         Logger.info("Setting up external integrations...");
         
+        // TODO: Implement in Step 7.1 when integration managers are implemented
         // Economy integration (Vault)
-        if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
-            economyManager = new EconomyManager(this);
-            if (economyManager.setupEconomy()) {
-                Logger.info("Vault economy integration enabled!");
-            } else {
-                Logger.warning("Vault found but no economy plugin detected!");
-            }
-        }
+        // if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
+        //     economyManager = new EconomyManager(this);
+        //     if (economyManager.setupEconomy()) {
+        //         Logger.info("Vault economy integration enabled!");
+        //     } else {
+        //         Logger.warning("Vault found but no economy plugin detected!");
+        //     }
+        // }
         
         // PlaceholderAPI integration
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new PlaceholderExpansion(this, gameManager, databaseManager).register();
-            Logger.info("PlaceholderAPI integration enabled!");
-        }
+        // if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        //     new PlaceholderExpansion(this, gameManager, databaseManager).register();
+        //     Logger.info("PlaceholderAPI integration enabled!");
+        // }
         
-        Logger.info("External integrations setup complete!");
+        Logger.info("External integrations setup will be completed in Step 7.1!");
     }
-    
-    /**
+      /**
      * Reload plugin configuration and managers
      */
     public void reloadPlugin() {
@@ -187,8 +186,9 @@ public class CrysisShot extends JavaPlugin {
             configManager.loadConfigurations();
             messageManager.loadMessages();
             
+            // TODO: Implement in Step 2.1 when GameManager is available
             // Reinitialize game manager with new config
-            gameManager.reload();
+            // gameManager.reload();
             
             Logger.info("Plugin reloaded successfully!");
             
@@ -210,18 +210,19 @@ public class CrysisShot extends JavaPlugin {
     public MessageManager getMessageManager() {
         return messageManager;
     }
-    
-    public DatabaseManager getDatabaseManager() {
+      public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
     
-    public GameManager getGameManager() {
-        return gameManager;
-    }
+    // TODO: Implement in Step 2.1 when GameManager is available
+    // public GameManager getGameManager() {
+    //     return gameManager;
+    // }
     
-    public EconomyManager getEconomyManager() {
-        return economyManager;
-    }
+    // TODO: Implement in Step 7.1 when EconomyManager is available
+    // public EconomyManager getEconomyManager() {
+    //     return economyManager;
+    // }
     
     public boolean isPluginEnabled() {
         return pluginEnabled;

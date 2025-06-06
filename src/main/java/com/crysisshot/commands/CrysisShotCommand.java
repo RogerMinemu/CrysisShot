@@ -1,7 +1,8 @@
 package com.crysisshot.commands;
 
 import com.crysisshot.CrysisShot;
-import com.crysisshot.game.GameManager;
+// TODO: Implement in Step 2.1 when GameManager is available
+// import com.crysisshot.game.GameManager;
 import com.crysisshot.localization.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,12 +20,14 @@ import java.util.List;
 public class CrysisShotCommand implements CommandExecutor, TabCompleter {
     
     private final CrysisShot plugin;
-    private final GameManager gameManager;
+    // TODO: Implement in Step 2.1 when GameManager is available
+    // private final GameManager gameManager;
     private final MessageManager messageManager;
     
-    public CrysisShotCommand(CrysisShot plugin, GameManager gameManager, MessageManager messageManager) {
+    public CrysisShotCommand(CrysisShot plugin, MessageManager messageManager) {
         this.plugin = plugin;
-        this.gameManager = gameManager;
+        // TODO: Update in Step 2.1 when GameManager is available
+        // this.gameManager = gameManager;
         this.messageManager = messageManager;
     }
     
@@ -41,8 +44,7 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             case "help":
                 showHelp(sender);
                 break;
-                
-            case "join":
+                  case "join":
                 handleJoin(sender);
                 break;
                 
@@ -110,10 +112,9 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("§e/cs version §7- Show plugin version");
         }
     }
-    
-    private void handleJoin(CommandSender sender) {
+      private void handleJoin(CommandSender sender) {
         if (!(sender instanceof Player)) {
-            messageManager.sendMessage((Player) sender, "commands.player-only");
+            sender.sendMessage("This command can only be used by players!");
             return;
         }
         
@@ -124,13 +125,13 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             return;
         }
         
-        // TODO: Implement game joining logic
-        messageManager.sendMessage(player, "game.join-success");
+        // TODO: Implement game joining logic in Step 2.1 when GameManager is available
+        messageManager.sendMessage(player, "game.join-feature-coming-soon");
     }
     
     private void handleLeave(CommandSender sender) {
         if (!(sender instanceof Player)) {
-            messageManager.sendMessage((Player) sender, "commands.player-only");
+            sender.sendMessage("This command can only be used by players!");
             return;
         }
         
@@ -141,8 +142,8 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             return;
         }
         
-        // TODO: Implement game leaving logic
-        messageManager.sendMessage(player, "game.leave-success");
+        // TODO: Implement game leaving logic in Step 2.1 when GameManager is available
+        messageManager.sendMessage(player, "game.leave-feature-coming-soon");
     }
     
     private void handleStats(CommandSender sender, String[] args) {
@@ -266,10 +267,10 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             }
         }
     }
-    
-    private void showVersion(CommandSender sender) {
-        String version = plugin.getDescription().getVersion();
-        String authors = String.join(", ", plugin.getDescription().getAuthors());
+      private void showVersion(CommandSender sender) {
+        // Use PluginMeta instead of deprecated getDescription()
+        String version = plugin.getPluginMeta().getVersion();
+        String authors = String.join(", ", plugin.getPluginMeta().getAuthors());
         
         sender.sendMessage("§6CrysisShot §7v" + version);
         sender.sendMessage("§7Authors: " + authors);
