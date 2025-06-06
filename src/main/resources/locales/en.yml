@@ -197,3 +197,24 @@ messages:
     spectator-joined: "<gray>{player} is now spectating"
     game-starting-soon: "<yellow>Game starting in <gold>30</gold> seconds!"
     waiting-for-players: "<yellow>Waiting for more players... (<white>{current}</white>/<white>{min}</white>)"
+    
+  # Additional scoring system messages
+  kill:
+    normal: "<green>+{points} points</green> for killing <yellow>{victim}</yellow>"
+    combo: "<gold>+{points} points</gold> for killing <yellow>{victim}</yellow> <gray>(x{multiplier} combo, {streak} streak!)</gray>"
+  
+  death:
+    killed: "<red>You were killed by</red> <yellow>{killer}</yellow> <gray>({killer_score} points)</gray>"
+  
+  killstreak:
+    milestone: "<gold><bold>{player}</bold></gold> <yellow>is on a</yellow> <gold>{streak}</gold> <yellow>kill streak!</yellow>"
+  
+  winner:
+    announced: "<gold><bold>🏆 WINNER: {winner} 🏆</bold></gold> <yellow>with</yellow> <green>{score}</green> <yellow>points!</yellow>"
+  
+  leaderboard:
+    header: "<gold><bold>=== 🏆 FINAL LEADERBOARD 🏆 ===</bold></gold>"
+    entry: "<yellow>{position}.</yellow> <white>{player}</white> <gray>-</gray> <green>{score} pts</green> <gray>({kills}K/{deaths}D)</gray>"
+  
+  end:
+    thankyou: "<yellow>Thanks for playing CrysisShot! 🎯</yellow>"

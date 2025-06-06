@@ -5,6 +5,7 @@ import com.crysisshot.game.GameManager;
 import com.crysisshot.game.GameSession;
 import com.crysisshot.localization.MessageManager;
 import com.crysisshot.models.GamePlayer;
+import com.crysisshot.scoring.ScoringManager;
 import com.crysisshot.utils.Logger;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
@@ -31,6 +32,7 @@ public class CombatListener implements Listener {
     private final CrysisShot plugin;
     private final GameManager gameManager;
     private final MessageManager messageManager;
+    private final ScoringManager scoringManager;
     
     // Track arrows fired by players for proper attribution
     private final Map<UUID, UUID> arrowOwners = new HashMap<>();
@@ -39,6 +41,7 @@ public class CombatListener implements Listener {
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.messageManager = plugin.getMessageManager();
+        this.scoringManager = new ScoringManager(plugin);
     }
     
     /**
@@ -213,78 +216,46 @@ public class CombatListener implements Listener {
         
         Logger.info("Melee kill: " + attacker.getName() + " -> " + victim.getName());
     }
-    
-    /**
+      /**
      * Execute a kill with proper statistics and respawn handling
      */
     private void executeKill(Player killer, Player victim, String weaponType, 
                            GamePlayer killerGame, GamePlayer victimGame) {
         
-        // Update statistics
-        killerGame.addKill();
-        victimGame.addDeath();
+        // Get the game session
+        String sessionId = gameManager.getPlayerSession(killer);
+        if (sessionId == null) {
+            return;
+        }
         
-        // Update kill streak
-        killerGame.incrementKillStreak();
-        victimGame.resetKillStreak();
+        GameSession session = gameManager.getSession(sessionId);
+        if (session == null) {
+            return;
+        }
         
-        // Check for special achievements
-        checkKillAchievements(killer, killerGame);
+        // Determine kill type for scoring
+        ScoringManager.KillType killType;
+        switch (weaponType.toLowerCase()) {
+            case "bow":
+                killType = ScoringManager.KillType.BOW;
+                break;
+            case "sword":
+            case "axe":
+                killType = ScoringManager.KillType.MELEE;
+                break;
+            default:
+                killType = ScoringManager.KillType.ENVIRONMENTAL;
+                break;
+        }
         
-        // Broadcast kill message
-        broadcastKillMessage(killer, victim, weaponType, killerGame);
+        // Process the kill through the scoring manager
+        // This handles all statistics, scoring, messaging, and win condition checking
+        scoringManager.processKill(session, killerGame, victimGame, killType);
         
-        // Handle victim death
+        // Handle victim death (respawn logic)
         handlePlayerDeath(victim, victimGame);
-        
-        // Check win conditions
-        checkWinConditions(killer);
     }
-    
-    /**
-     * Check for kill streak achievements and combos
-     */
-    private void checkKillAchievements(Player killer, GamePlayer killerGame) {
-        int streak = killerGame.getKillStreak();
-        
-        // Check for first blood
-        String sessionId = gameManager.getPlayerSession(killer);
-        if (sessionId != null) {
-            GameSession session = gameManager.getSession(sessionId);
-            if (session != null && session.getTotalKills() == 1) {
-                broadcastToSession(sessionId, "game.kill-first-blood", "killer", killer.getName());
-            }
-        }
-        
-        // Check for kill streaks
-        if (streak == 3) {
-            broadcastToSession(gameManager.getPlayerSession(killer), 
-                "game.combo-achieved", 
-                "player", killer.getName(),
-                "streak", String.valueOf(streak));
-        } else if (streak == 6) {
-            broadcastToSession(gameManager.getPlayerSession(killer), 
-                "game.combo-unstoppable", 
-                "player", killer.getName(),
-                "streak", String.valueOf(streak));
-        }
-    }
-    
-    /**
-     * Broadcast kill message to all players in the session
-     */
-    private void broadcastKillMessage(Player killer, Player victim, String weaponType, GamePlayer killerGame) {
-        String sessionId = gameManager.getPlayerSession(killer);
-        if (sessionId == null) return;
-        
-        String messageKey = weaponType.equals("bow") ? "game.kill-bow" : "game.kill-sword";
-        
-        broadcastToSession(sessionId, messageKey,
-            "killer", killer.getName(),
-            "victim", victim.getName());
-    }
-    
-    /**
+      /**
      * Handle player death with respawn mechanics
      */
     private void handlePlayerDeath(Player victim, GamePlayer victimGame) {
@@ -383,40 +354,5 @@ public class CombatListener implements Listener {
         
         return session1 != null && session1.equals(session2);
     }
-    
-    /**
-     * Check win conditions after a kill
-     */
-    private void checkWinConditions(Player killer) {
-        String sessionId = gameManager.getPlayerSession(killer);
-        if (sessionId == null) return;
-        
-        GameSession session = gameManager.getSession(sessionId);
-        if (session == null) return;
-        
-        GamePlayer killerGame = gameManager.getGamePlayer(killer);
-        if (killerGame == null) return;
-        
-        int targetScore = plugin.getConfigManager().getTargetScore();
-        if (killerGame.getCurrentScore() >= targetScore) {
-            session.endGame(killer.getName() + " reached target score!");
-        }
-    }
-    
-    /**
-     * Broadcast message to all players in a session
-     */
-    private void broadcastToSession(String sessionId, String messageKey, String... placeholders) {
-        if (sessionId == null) return;
-        
-        GameSession session = gameManager.getSession(sessionId);
-        if (session == null) return;
-        
-        for (UUID playerId : session.getPlayers().keySet()) {
-            Player player = plugin.getServer().getPlayer(playerId);
-            if (player != null) {
-                messageManager.sendMessage(player, messageKey, placeholders);
-            }
-        }
-    }
+  
 }

@@ -429,4 +429,36 @@ public class GamePlayer {
         SHIELD,
         SCORE_MULTIPLIER
     }
+    
+    // ===========================================
+    // ADDITIONAL METHODS FOR SCORING SYSTEM
+    // ===========================================
+    
+    /**
+     * Get the Bukkit player instance (alias for getBukkitPlayer)
+     */
+    public Player getPlayer() {
+        return bukkitPlayer;
+    }
+    
+    /**
+     * Get current score (alias for getCurrentScore)
+     */
+    public int getScore() {
+        return currentScore;
+    }
+    
+    /**
+     * Add score to player's current total
+     */
+    public void addScore(int points) {
+        this.currentScore += points;
+    }
+    
+    /**
+     * Get arrows used (total arrows fired)
+     */
+    public int getArrowsUsed() {
+        return sessionArrowsFired;
+    }
 }

@@ -415,11 +415,10 @@ public class GameSession {
         Logger.info("Kill recorded: " + killer.getPlayerName() + " -> " + victim.getPlayerName() + 
                    " (Arrow: " + wasArrowKill + ")");
     }
-    
-    /**
+      /**
      * Broadcast a message to all players in the game
      */
-    private void broadcastMessage(String messageKey, String... placeholders) {
+    public void broadcastMessage(String messageKey, String... placeholders) {
         for (GamePlayer gamePlayer : players.values()) {
             Player bukkitPlayer = gamePlayer.getBukkitPlayer();
             if (bukkitPlayer != null && bukkitPlayer.isOnline()) {
@@ -429,13 +428,50 @@ public class GameSession {
     }
     
     /**
+     * Broadcast a raw message to all players in the game
+     */
+    public void broadcastMessage(String message) {
+        for (GamePlayer gamePlayer : players.values()) {
+            Player bukkitPlayer = gamePlayer.getBukkitPlayer();
+            if (bukkitPlayer != null && bukkitPlayer.isOnline()) {
+                bukkitPlayer.sendMessage(message);
+            }
+        }
+    }
+    
+    /**
      * Set the game state and handle state transitions
      */
-    private void setState(GameState newState) {
+    public void setState(GameState newState) {
         GameState oldState = this.currentState;
         this.currentState = newState;
         
         Logger.debug("Game session " + sessionId + " state changed: " + oldState + " -> " + newState);
+    }
+    
+    /**
+     * Update player statistics after a kill/death event
+     */
+    public void updatePlayerStatistics(GamePlayer killer, GamePlayer victim) {
+        if (killer != null) {
+            killer.addKill();
+            incrementTotalKills();
+        }
+        
+        if (victim != null) {
+            victim.addDeath();
+        }
+        
+        Logger.debug(String.format("Updated statistics for kill: " +
+            killer != null ? killer.getPlayerName() : "unknown",
+            victim != null ? victim.getPlayerName() : "unknown"));
+    }
+    
+    /**
+     * Get all players as a collection for easy iteration
+     */
+    public Collection<GamePlayer> getPlayersCollection() {
+        return players.values();
     }
     
     // Getters and state checkers
