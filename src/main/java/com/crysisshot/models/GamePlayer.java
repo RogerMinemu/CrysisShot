@@ -55,13 +55,13 @@ public class GamePlayer {
     private boolean isRespawning;
     private long respawnTime;
     private Location respawnLocation;
-    
-    /**
+      /**
      * Player states within a game
      */
     public enum GamePlayerState {
         WAITING,      // In lobby/queue
         PLAYING,      // Active in game
+        DEAD,         // Dead and waiting for respawn
         SPECTATING,   // Spectating after death/elimination
         RESPAWNING,   // Waiting to respawn
         ELIMINATED    // Permanently out of current game
@@ -335,6 +335,89 @@ public class GamePlayer {
     public void setRespawnTime(long respawnTime) { this.respawnTime = respawnTime; }
     public Location getRespawnLocation() { return respawnLocation; }
     public void setRespawnLocation(Location respawnLocation) { this.respawnLocation = respawnLocation; }
+    
+    // ===========================================
+    // COMBAT AND STATISTICS METHODS
+    // ===========================================
+    
+    /**
+     * Consume one arrow
+     */
+    public void consumeArrow() {
+        if (arrows > 0) {
+            arrows--;
+        }
+    }
+    
+    /**
+     * Add arrows to player's inventory
+     */
+    public void addArrows(int amount) {
+        this.arrows += amount;
+    }
+    
+    /**
+     * Increment arrows fired counter
+     */
+    public void incrementArrowsFired() {
+        this.sessionArrowsFired++;
+    }
+    
+    /**
+     * Increment arrows hit counter
+     */
+    public void incrementArrowsHit() {
+        this.sessionArrowsHit++;
+    }
+    
+    /**
+     * Add a kill to the player's statistics
+     */
+    public void addKill() {
+        this.sessionKills++;
+        this.currentScore++;
+        this.lastKillTime = System.currentTimeMillis();
+    }
+    
+    /**
+     * Add a death to the player's statistics
+     */
+    public void addDeath() {
+        this.sessionDeaths++;
+    }
+    
+    /**
+     * Increment kill streak
+     */
+    public void incrementKillStreak() {
+        this.killStreak++;
+    }
+      /**
+     * Reset kill streak to zero
+     */
+    public void resetKillStreak() {
+        this.killStreak = 0;
+    }
+    
+    /**
+     * Respawn the player
+     */
+    public void respawn() {
+        this.state = GamePlayerState.PLAYING;
+        this.isRespawning = false;
+        this.respawnTime = 0;
+        
+        // Reset health and status effects if bukkit player is available
+        if (bukkitPlayer != null && bukkitPlayer.isOnline()) {
+            bukkitPlayer.setHealth(20.0);
+            bukkitPlayer.setFoodLevel(20);
+            bukkitPlayer.setSaturation(20);
+            
+            // Clear negative effects
+            bukkitPlayer.getActivePotionEffects().forEach(effect -> 
+                bukkitPlayer.removePotionEffect(effect.getType()));
+        }
+    }
     
     /**
      * Power-up types available in the game

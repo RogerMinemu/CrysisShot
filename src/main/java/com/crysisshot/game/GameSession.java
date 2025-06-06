@@ -44,6 +44,7 @@ public class GameSession {
     private BukkitTask gameTask;
     private BukkitTask countdownTask;
     private int countdownSeconds;
+    private int totalKills; // Track total kills in the session
     
     // Arena information
     private Location lobbyLocation;
@@ -66,13 +67,14 @@ public class GameSession {
         this.configManager = plugin.getConfigManager();
         this.messageManager = plugin.getMessageManager();
         this.arenaName = arenaName;
-        
-        // Initialize collections
+          // Initialize collections
         this.players = new ConcurrentHashMap<>();
         this.playerScores = new ConcurrentHashMap<>();
         this.spawnPoints = new ArrayList<>();
         this.powerupSpawnLocations = new ArrayList<>();
-          // Load configuration
+        this.totalKills = 0;
+        
+        // Load configuration
         loadGameConfiguration();
         
         // Set initial state and creation time
@@ -394,6 +396,9 @@ public class GameSession {
         // Update scores map
         playerScores.put(killer.getPlayerId(), killer.getCurrentScore());
         
+        // Increment total kills
+        totalKills++;
+        
         // Broadcast kill message
         String killType = wasArrowKill ? "bow" : "sword";
         broadcastMessage("game.kill-" + killType,
@@ -506,5 +511,19 @@ public class GameSession {
      */
     public boolean canAcceptPlayers() {
         return currentState == GameState.WAITING && players.size() < maxPlayers;
+    }
+    
+    /**
+     * Get total kills in this session
+     */
+    public int getTotalKills() {
+        return totalKills;
+    }
+    
+    /**
+     * Increment total kills counter
+     */
+    public void incrementTotalKills() {
+        this.totalKills++;
     }
 }

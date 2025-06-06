@@ -11,9 +11,11 @@ game:
   
   # Minimum players to start a game
   min-players: 4
-  
-  # Respawn delay in seconds after death
+    # Respawn delay in seconds after death
   respawn-delay: 3
+  
+  # Starting arrows per player
+  starting-arrows: 1
   
   # Kill streak thresholds for combo multipliers
   combo-thresholds: [3, 6]

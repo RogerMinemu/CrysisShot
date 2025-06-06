@@ -116,9 +116,12 @@ public class ConfigManager {
         if (!config.contains("game.min-players")) {
             config.set("game.min-players", 4);
             modified = true;
-        }
-        if (!config.contains("game.respawn-delay")) {
+        }        if (!config.contains("game.respawn-delay")) {
             config.set("game.respawn-delay", 3);
+            modified = true;
+        }
+        if (!config.contains("game.starting-arrows")) {
+            config.set("game.starting-arrows", 1);
             modified = true;
         }
         if (!config.contains("game.combo-thresholds")) {
@@ -230,9 +233,12 @@ public class ConfigManager {
     public int getMinPlayers() {
         return config.getInt("game.min-players", 4);
     }
-    
-    public int getRespawnDelay() {
+      public int getRespawnDelay() {
         return config.getInt("game.respawn-delay", 3);
+    }
+    
+    public int getStartingArrows() {
+        return config.getInt("game.starting-arrows", 1);
     }
     
     public List<Integer> getComboThresholds() {
