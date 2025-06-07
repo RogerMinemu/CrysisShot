@@ -69,13 +69,26 @@ messages:
     letal: "<red>Letal"
     veterano: "<gold>Veterano"
     deadeye: "<dark_red><bold>Deadeye</bold></dark_red>"
-    
-  # Arena messages
+      # Arena messages
   arena:
     selected: "<yellow>Arena selected: <gold>{arena}</gold>"
     not-found: "<red>Arena not found: {arena}"
     loading: "<yellow>Loading arena: <gold>{arena}</gold>..."
     loaded: "<green>Arena loaded successfully!"
+    reloaded: "<green>Arena configuration reloaded! Total: <yellow>{count}</yellow> arenas"
+    unavailable: "<red>Arena <yellow>{arena}</yellow> is currently unavailable"
+    invalid: "<red>Arena <yellow>{arena}</yellow> is invalid and cannot be used"
+    no-suitable: "<red>No suitable arenas found for <yellow>{players}</yellow> players"
+    
+    # Arena validation messages
+    validation:
+      world-not-found: "World not found or not loaded: {world}"
+      no-lobby-spawn: "Lobby spawn not set"
+      no-spawn-points: "No spawn points defined"
+      insufficient-spawns: "Not enough spawn points for minimum players ({current} < {required})"
+      spawns-too-close: "Spawn points too close: {distance} < {minimum}"
+      spawns-too-far: "Spawn points too far: {distance} > {maximum}"
+      insufficient-powerups: "Not enough power-up locations (minimum: {required})"
     
     # Setup messages
     setup:

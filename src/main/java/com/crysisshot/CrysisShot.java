@@ -1,5 +1,6 @@
 package com.crysisshot;
 
+import com.crysisshot.arena.ArenaManager;
 import com.crysisshot.commands.CrysisShotCommand;
 import com.crysisshot.config.ConfigManager;
 import com.crysisshot.database.DatabaseManager;
@@ -22,11 +23,11 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @version 1.0.0
  */
 public class CrysisShot extends JavaPlugin {
-    
-    private static CrysisShot instance;      // Core managers
+      private static CrysisShot instance;      // Core managers
     private ConfigManager configManager;
     private MessageManager messageManager;
     private DatabaseManager databaseManager;
+    private ArenaManager arenaManager;
     private GameManager gameManager;
     // private EconomyManager economyManager;
     
@@ -111,6 +112,9 @@ public class CrysisShot extends JavaPlugin {
         if (!databaseManager.initialize()) {
             throw new RuntimeException("Failed to initialize database");
         }
+        
+        // Arena manager (depends on config and message managers)
+        arenaManager = new ArenaManager(this);
         
         // Game manager (depends on database and config)
         gameManager = new GameManager(this);
@@ -203,9 +207,15 @@ public class CrysisShot extends JavaPlugin {
     
     public MessageManager getMessageManager() {
         return messageManager;
-    }
-      public DatabaseManager getDatabaseManager() {
+    }    public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+    
+    /**
+     * Get the arena manager
+     */
+    public ArenaManager getArenaManager() {
+        return arenaManager;
     }
     
     /**
