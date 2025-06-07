@@ -218,3 +218,9 @@ messages:
   
   end:
     thankyou: "<yellow>Thanks for playing CrysisShot! 🎯</yellow>"
+    
+  # Ranking system messages
+  rank:
+    promotion: "<green><bold>RANK UP!</bold></green> <yellow>You've been promoted from</yellow> {old_rank} <yellow>to</yellow> {new_rank}<yellow>!</yellow> <gray>({bow_kills} bow kills)</gray>"
+    deadeye_announcement: "<red><bold>🎯 NEW DEADEYE! 🎯</bold></red> <yellow>{player}</yellow> <red>has achieved the legendary Deadeye rank with</red> <gold>{bow_kills}</gold> <red>bow kills!</red>"
+    deadeye_lost: "<yellow>You've been demoted from Deadeye rank. Your new rank is</yellow> {new_rank}<yellow>.</yellow>"

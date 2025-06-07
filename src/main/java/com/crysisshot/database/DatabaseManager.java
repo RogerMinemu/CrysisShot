@@ -2,6 +2,7 @@ package com.crysisshot.database;
 
 import com.crysisshot.CrysisShot;
 import com.crysisshot.models.PlayerStats;
+import com.crysisshot.ranking.Rank;
 import com.crysisshot.utils.Logger;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -20,14 +21,16 @@ public class DatabaseManager {
     private final CrysisShot plugin;
     private HikariDataSource dataSource;
     private boolean initialized = false;
-    
-    // SQL Queries
+      // SQL Queries
     private static final String CREATE_PLAYERS_TABLE = """
         CREATE TABLE IF NOT EXISTS crysis_players (
             player_id TEXT PRIMARY KEY,
             player_name TEXT NOT NULL,
             total_kills INTEGER DEFAULT 0,
             total_deaths INTEGER DEFAULT 0,
+            bow_kills INTEGER DEFAULT 0,
+            melee_kills INTEGER DEFAULT 0,
+            current_rank TEXT DEFAULT 'NOVATO',
             games_played INTEGER DEFAULT 0,
             games_won INTEGER DEFAULT 0,
             longest_kill_streak INTEGER DEFAULT 0,
@@ -44,10 +47,10 @@ public class DatabaseManager {
     
     private static final String INSERT_PLAYER = """
         INSERT OR REPLACE INTO crysis_players 
-        (player_id, player_name, total_kills, total_deaths, games_played, games_won, 
-         longest_kill_streak, total_arrows_fired, total_arrows_hit, total_damage_dealt, 
-         powerups_collected, total_playtime, first_join, last_seen, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (player_id, player_name, total_kills, total_deaths, bow_kills, melee_kills, current_rank,
+         games_played, games_won, longest_kill_streak, total_arrows_fired, total_arrows_hit, 
+         total_damage_dealt, powerups_collected, total_playtime, first_join, last_seen, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
     
     private static final String SELECT_PLAYER = """
@@ -134,8 +137,7 @@ public class DatabaseManager {
         return dataSource.getConnection();
     }
     
-    /**
-     * Save player statistics to database
+    /**     * Save player statistics to database
      */
     public CompletableFuture<Boolean> savePlayerStats(PlayerStats stats) {
         return CompletableFuture.supplyAsync(() -> {
@@ -146,17 +148,20 @@ public class DatabaseManager {
                 stmt.setString(2, stats.getPlayerName());
                 stmt.setInt(3, stats.getTotalKills());
                 stmt.setInt(4, stats.getTotalDeaths());
-                stmt.setInt(5, stats.getGamesPlayed());
-                stmt.setInt(6, stats.getGamesWon());
-                stmt.setInt(7, stats.getLongestKillStreak());
-                stmt.setInt(8, stats.getTotalArrowsFired());
-                stmt.setInt(9, stats.getTotalArrowsHit());
-                stmt.setDouble(10, stats.getTotalDamageDealt());
-                stmt.setInt(11, stats.getPowerupsCollected());
-                stmt.setLong(12, stats.getTotalPlaytime());
-                stmt.setTimestamp(13, stats.getFirstJoin());
-                stmt.setTimestamp(14, stats.getLastSeen());
-                stmt.setBoolean(15, stats.isActive());
+                stmt.setInt(5, stats.getBowKills());
+                stmt.setInt(6, stats.getMeleeKills());
+                stmt.setString(7, stats.getCurrentRank().name());
+                stmt.setInt(8, stats.getGamesPlayed());
+                stmt.setInt(9, stats.getGamesWon());
+                stmt.setInt(10, stats.getLongestKillStreak());
+                stmt.setInt(11, stats.getTotalArrowsFired());
+                stmt.setInt(12, stats.getTotalArrowsHit());
+                stmt.setDouble(13, stats.getTotalDamageDealt());
+                stmt.setInt(14, stats.getPowerupsCollected());
+                stmt.setLong(15, stats.getTotalPlaytime());
+                stmt.setTimestamp(16, stats.getFirstJoin());
+                stmt.setTimestamp(17, stats.getLastSeen());
+                stmt.setBoolean(18, stats.isActive());
                 
                 return stmt.executeUpdate() > 0;
                 
@@ -253,8 +258,7 @@ public class DatabaseManager {
         
         return validColumns.contains(orderBy.toLowerCase()) ? orderBy : null;
     }
-    
-    /**
+      /**
      * Map ResultSet to PlayerStats object
      */
     private PlayerStats mapResultSetToPlayerStats(ResultSet rs) throws SQLException {
@@ -264,6 +268,18 @@ public class DatabaseManager {
         stats.setPlayerName(rs.getString("player_name"));
         stats.setTotalKills(rs.getInt("total_kills"));
         stats.setTotalDeaths(rs.getInt("total_deaths"));
+        stats.setBowKills(rs.getInt("bow_kills"));
+        stats.setMeleeKills(rs.getInt("melee_kills"));
+        
+        // Parse rank from string
+        try {
+            String rankStr = rs.getString("current_rank");
+            stats.setCurrentRank(Rank.valueOf(rankStr));
+        } catch (IllegalArgumentException e) {
+            // Default to NOVATO if rank is invalid
+            stats.setCurrentRank(Rank.NOVATO);
+        }
+        
         stats.setGamesPlayed(rs.getInt("games_played"));
         stats.setGamesWon(rs.getInt("games_won"));
         stats.setLongestKillStreak(rs.getInt("longest_kill_streak"));

@@ -1,5 +1,6 @@
 package com.crysisshot.models;
 
+import com.crysisshot.ranking.Rank;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -24,6 +25,9 @@ public class PlayerStats {
     private Timestamp firstJoin;
     private Timestamp lastSeen;
     private boolean isActive;
+    private int bowKills;  // New field for bow-specific kills
+    private int meleeKills; // New field for melee-specific kills
+    private Rank currentRank; // New field for player rank
     
     // Default constructor
     public PlayerStats() {}
@@ -45,6 +49,9 @@ public class PlayerStats {
         this.firstJoin = new Timestamp(System.currentTimeMillis());
         this.lastSeen = new Timestamp(System.currentTimeMillis());
         this.isActive = true;
+        this.bowKills = 0;
+        this.meleeKills = 0;
+        this.currentRank = Rank.NOVATO;
     }
     
     // Getters
@@ -63,6 +70,9 @@ public class PlayerStats {
     public Timestamp getFirstJoin() { return firstJoin; }
     public Timestamp getLastSeen() { return lastSeen; }
     public boolean isActive() { return isActive; }
+    public int getBowKills() { return bowKills; }  // Getter for bowKills
+    public int getMeleeKills() { return meleeKills; } // Getter for meleeKills
+    public Rank getCurrentRank() { return currentRank; } // Getter for currentRank
     
     // Setters
     public void setPlayerId(UUID playerId) { this.playerId = playerId; }
@@ -80,6 +90,9 @@ public class PlayerStats {
     public void setFirstJoin(Timestamp firstJoin) { this.firstJoin = firstJoin; }
     public void setLastSeen(Timestamp lastSeen) { this.lastSeen = lastSeen; }
     public void setActive(boolean active) { this.isActive = active; }
+    public void setBowKills(int bowKills) { this.bowKills = bowKills; }  // Setter for bowKills
+    public void setMeleeKills(int meleeKills) { this.meleeKills = meleeKills; } // Setter for meleeKills
+    public void setCurrentRank(Rank currentRank) { this.currentRank = currentRank; } // Setter for currentRank
     
     // Calculated getters
     public double getKillDeathRatio() {
@@ -106,6 +119,8 @@ public class PlayerStats {
     public void incrementArrowsFired() { this.totalArrowsFired++; }
     public void incrementArrowsHit() { this.totalArrowsHit++; }
     public void incrementPowerupsCollected() { this.powerupsCollected++; }
+    public void incrementBowKills() { this.bowKills++; }  // Incrementer for bowKills
+    public void incrementMeleeKills() { this.meleeKills++; } // Incrementer for meleeKills
     
     public void addDamage(double damage) { this.totalDamageDealt += damage; }
     public void addPlaytime(long seconds) { this.totalPlaytime += seconds; }

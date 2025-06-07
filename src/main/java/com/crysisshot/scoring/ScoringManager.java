@@ -5,6 +5,8 @@ import com.crysisshot.config.ConfigManager;
 import com.crysisshot.game.GameSession;
 import com.crysisshot.localization.MessageManager;
 import com.crysisshot.models.GamePlayer;
+import com.crysisshot.models.PlayerStats;
+import com.crysisshot.ranking.Rank;
 import com.crysisshot.utils.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -49,9 +51,11 @@ public class ScoringManager {
         
         // Calculate final score
         int finalScore = (int) Math.round(basePoints * multiplier);
-        
-        // Award points
+          // Award points
         killer.addScore(finalScore);
+        
+        // Update persistent stats and check for rank progression
+        updatePlayerStatsAndRank(killer, killType);
         
         // Reset victim's kill streak
         victim.resetKillStreak();
@@ -310,6 +314,101 @@ public class ScoringManager {
             .collect(Collectors.toList());
     }
     
+    /**
+     * Update player persistent stats and check for rank progression
+     */
+    private void updatePlayerStatsAndRank(GamePlayer gamePlayer, KillType killType) {
+        if (gamePlayer == null || gamePlayer.getPlayer() == null) {
+            return;
+        }
+        
+        Player player = gamePlayer.getPlayer();
+          // Run async to avoid blocking the main thread
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                // Load player stats
+                PlayerStats stats = plugin.getDatabaseManager().loadPlayerStats(player.getUniqueId()).join();
+                if (stats == null) {
+                    // Create new stats if player doesn't exist
+                    stats = new PlayerStats(player.getUniqueId(), player.getName());
+                }
+                
+                // Get current rank before update
+                Rank oldRank = stats.getCurrentRank();
+                
+                // Update kill statistics based on kill type
+                stats.incrementKills();
+                if (killType == KillType.BOW) {
+                    stats.incrementBowKills();
+                } else if (killType == KillType.MELEE) {
+                    stats.incrementMeleeKills();
+                }
+                
+                // Update last seen
+                stats.updateLastSeen();
+                
+                // Check for rank progression based on bow kills
+                Rank newRank = Rank.getRankByKills(stats.getBowKills());
+                
+                // Check if rank has improved
+                if (newRank != oldRank && newRank.ordinal() > oldRank.ordinal()) {
+                    // Update rank
+                    stats.setCurrentRank(newRank);
+                    
+                    // Create final variables for lambda
+                    final int finalBowKills = stats.getBowKills();
+                    final Rank finalOldRank = oldRank;
+                    final Rank finalNewRank = newRank;
+                    
+                    // Notify player of rank promotion (run on main thread)
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        notifyRankPromotion(player, finalOldRank, finalNewRank, finalBowKills);
+                    });
+                }
+                
+                // Save updated stats
+                plugin.getDatabaseManager().savePlayerStats(stats);
+                  } catch (Exception e) {
+                Logger.severe("Error updating player stats and rank for " + player.getName() + ": " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+    
+    /**
+     * Notify player of rank promotion
+     */
+    private void notifyRankPromotion(Player player, Rank oldRank, Rank newRank, int bowKills) {
+        if (player == null || !player.isOnline()) {
+            return;
+        }
+        
+        try {            // Send promotion message
+            String message = messages.getMessage("rank.promotion", 
+                oldRank.getFormattedName(), newRank.getFormattedName(), String.valueOf(bowKills));
+            player.sendMessage(message);
+            
+            // Play sound effect
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
+            
+            // Special handling for Deadeye rank
+            if (newRank == Rank.DEADEYE) {
+                // Broadcast to all players
+                String announcement = messages.getMessage("rank.deadeye_announcement", 
+                    player.getName(), String.valueOf(bowKills));
+                Bukkit.getServer().broadcastMessage(announcement);
+                
+                Logger.info("Player " + player.getName() + " achieved Deadeye rank with " + bowKills + " bow kills!");
+            }
+            
+            Logger.info("Player " + player.getName() + " promoted from " + 
+                       oldRank.getDisplayName() + " to " + newRank.getDisplayName());
+              } catch (Exception e) {
+            Logger.severe("Error notifying rank promotion: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Types of kills for scoring purposes
      */
