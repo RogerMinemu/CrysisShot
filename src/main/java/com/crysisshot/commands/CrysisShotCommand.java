@@ -1,6 +1,8 @@
 package com.crysisshot.commands;
 
 import com.crysisshot.CrysisShot;
+import com.crysisshot.arena.Arena;
+import com.crysisshot.arena.ArenaSetupManager;
 import com.crysisshot.game.GameManager;
 import com.crysisshot.localization.MessageManager;
 import org.bukkit.command.Command;
@@ -11,20 +13,23 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Main command handler for CrysisShot plugin
  */
 public class CrysisShotCommand implements CommandExecutor, TabCompleter {
-      private final CrysisShot plugin;
+    private final CrysisShot plugin;
     private final GameManager gameManager;
     private final MessageManager messageManager;
+    private final ArenaSetupManager arenaSetupManager;
     
     public CrysisShotCommand(CrysisShot plugin, MessageManager messageManager, GameManager gameManager) {
         this.plugin = plugin;
         this.gameManager = gameManager;
         this.messageManager = messageManager;
+        this.arenaSetupManager = plugin.getArenaSetupManager();
     }
     
     @Override
@@ -99,10 +104,9 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             messageManager.sendMessage(player, "commands.help.stats");
             messageManager.sendMessage(player, "commands.help.leaderboard");
             messageManager.sendMessage(player, "commands.help.language");
-            
-            if (player.hasPermission("crysisshot.admin")) {
+              if (player.hasPermission("crysisshot.admin")) {
                 messageManager.sendMessage(player, "commands.admin-help.header");
-                messageManager.sendMessage(player, "commands.admin-help.create");
+                messageManager.sendMessage(player, "commands.admin-help.setup");
                 messageManager.sendMessage(player, "commands.admin-help.reload");
             }
         } else {
@@ -270,8 +274,7 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
         String language = args[1].toLowerCase();
         messageManager.setPlayerLanguage(player, language);
     }
-    
-    private void handleAdmin(CommandSender sender, String[] args) {
+      private void handleAdmin(CommandSender sender, String[] args) {
         if (!sender.hasPermission("crysisshot.admin")) {
             if (sender instanceof Player) {
                 messageManager.sendMessage((Player) sender, "commands.no-permission");
@@ -282,11 +285,7 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
         }
         
         if (args.length < 2) {
-            if (sender instanceof Player) {
-                messageManager.sendMessage((Player) sender, "commands.admin-help.header");
-            } else {
-                sender.sendMessage("Available admin commands: reload, version");
-            }
+            showAdminHelp(sender);
             return;
         }
         
@@ -297,19 +296,183 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
                 handleReload(sender);
                 break;
                 
-            case "create":
-                // TODO: Implement arena creation
-                sender.sendMessage("Arena creation not yet implemented!");
+            case "setup":
+                handleSetupCommands(sender, args);
                 break;
                 
             default:
                 if (sender instanceof Player) {
                     messageManager.sendMessage((Player) sender, "commands.invalid-args", 
-                        "usage", "/cs admin <reload|create>");
+                        "usage", "/cs admin <reload|setup>");
                 } else {
-                    sender.sendMessage("Invalid admin command!");
+                    sender.sendMessage("Invalid admin command! Use: reload, setup");
                 }
                 break;
+        }
+    }
+    
+    private void showAdminHelp(CommandSender sender) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            messageManager.sendMessage(player, "commands.admin-help.header");
+            messageManager.sendMessage(player, "commands.admin-help.reload");
+            messageManager.sendMessage(player, "commands.admin-help.setup");
+        } else {
+            sender.sendMessage("§6--- CrysisShot Admin Commands ---");
+            sender.sendMessage("§e/cs admin reload §7- Reload plugin configuration");
+            sender.sendMessage("§e/cs admin setup <command> §7- Arena setup commands");
+            sender.sendMessage("§e/cs admin setup help §7- Show setup command help");
+        }
+    }
+    
+    private void handleSetupCommands(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Setup commands can only be used by players!");
+            return;
+        }
+        
+        Player player = (Player) sender;
+        
+        if (!player.hasPermission("crysisshot.admin.setup")) {
+            messageManager.sendMessage(player, "commands.no-permission");
+            return;
+        }
+        
+        if (args.length < 3) {
+            showSetupCommandHelp(player);
+            return;
+        }
+        
+        String setupCommand = args[2].toLowerCase();
+        
+        switch (setupCommand) {
+            case "start":
+                if (args.length < 4) {
+                    messageManager.sendMessage(player, "arena.setup.start-usage");
+                    return;
+                }
+                String arenaName = args[3];
+                arenaSetupManager.startSetup(player, arenaName);
+                break;
+                
+            case "end":
+            case "finish":
+                boolean save = true;
+                if (args.length >= 4 && args[3].equalsIgnoreCase("nosave")) {
+                    save = false;
+                }
+                arenaSetupManager.endSetup(player, save);
+                break;
+                
+            case "cancel":
+                arenaSetupManager.endSetup(player, false);
+                break;
+                
+            case "gui":
+                if (arenaSetupManager.isInSetupMode(player)) {
+                    arenaSetupManager.openSetupGUI(player);
+                } else {
+                    messageManager.sendMessage(player, "arena.setup.not-in-setup");
+                }
+                break;
+                
+            case "test":
+                handleArenaTest(player, args);
+                break;
+                
+            case "list":
+                handleArenaList(player);
+                break;
+                
+            case "help":
+                showSetupCommandHelp(player);
+                break;
+                
+            default:
+                // If player is in setup mode, delegate to setup manager
+                if (arenaSetupManager.isInSetupMode(player)) {
+                    // Create new args array starting from "setup" command
+                    String[] setupArgs = new String[args.length - 1];
+                    setupArgs[0] = "setup";
+                    System.arraycopy(args, 2, setupArgs, 1, args.length - 2);
+                    arenaSetupManager.handleSetupCommand(player, setupArgs);
+                } else {
+                    messageManager.sendMessage(player, "arena.setup.not-in-setup-for-command");
+                }
+                break;
+        }
+    }
+    
+    private void showSetupCommandHelp(Player player) {
+        messageManager.sendMessage(player, "commands.setup-help.header");
+        messageManager.sendMessage(player, "commands.setup-help.start");
+        messageManager.sendMessage(player, "commands.setup-help.end");
+        messageManager.sendMessage(player, "commands.setup-help.cancel");
+        messageManager.sendMessage(player, "commands.setup-help.gui");
+        messageManager.sendMessage(player, "commands.setup-help.test");
+        messageManager.sendMessage(player, "commands.setup-help.list");
+        
+        if (arenaSetupManager.isInSetupMode(player)) {
+            messageManager.sendMessage(player, "commands.setup-help.in-setup-header");
+            messageManager.sendMessage(player, "commands.setup-help.lobby");
+            messageManager.sendMessage(player, "commands.setup-help.spectator");
+            messageManager.sendMessage(player, "commands.setup-help.spawn");
+            messageManager.sendMessage(player, "commands.setup-help.powerup");
+            messageManager.sendMessage(player, "commands.setup-help.bounds");
+            messageManager.sendMessage(player, "commands.setup-help.theme");
+            messageManager.sendMessage(player, "commands.setup-help.players");
+            messageManager.sendMessage(player, "commands.setup-help.validate");
+            messageManager.sendMessage(player, "commands.setup-help.info");
+        }
+    }
+    
+    private void handleArenaTest(Player player, String[] args) {
+        if (args.length < 4) {
+            messageManager.sendMessage(player, "arena.test.usage");
+            return;
+        }
+        
+        String arenaName = args[3];
+        Arena arena = plugin.getArenaManager().getArena(arenaName);
+        
+        if (arena == null) {
+            messageManager.sendMessage(player, "arena.not-exists", "arena", arenaName);
+            return;
+        }
+        
+        // Validate arena before testing
+        List<String> errors = plugin.getArenaManager().validateArena(arena);
+        if (!errors.isEmpty()) {
+            messageManager.sendMessage(player, "arena.test.validation-failed", 
+                "arena", arenaName, "errors", String.join(", ", errors));
+            return;
+        }
+        
+        // Teleport player to arena lobby for testing
+        if (arena.getLobbySpawn() != null) {
+            player.teleport(arena.getLobbySpawn());
+            messageManager.sendMessage(player, "arena.test.started", "arena", arenaName);
+        } else {
+            messageManager.sendMessage(player, "arena.test.no-lobby", "arena", arenaName);
+        }
+    }
+      private void handleArenaList(Player player) {
+        Collection<Arena> arenaCollection = plugin.getArenaManager().getAllArenas();
+        List<Arena> arenas = new ArrayList<>(arenaCollection);
+        
+        if (arenas.isEmpty()) {
+            messageManager.sendMessage(player, "arena.list.empty");
+            return;
+        }
+        
+        messageManager.sendMessage(player, "arena.list.header");
+        for (Arena arena : arenas) {
+            String status = arena.getState() == Arena.ArenaState.DISABLED ? "§c[DISABLED]" : 
+                           arena.getState() == Arena.ArenaState.MAINTENANCE ? "§e[MAINTENANCE]" : "§a[ACTIVE]";
+            
+            player.sendMessage(String.format("§7- §b%s %s §7(World: %s, Players: %d-%d)", 
+                arena.getName(), status, arena.getWorldName(), 
+                arena.getMinPlayers(), arena.getMaxPlayers()));
         }
     }
     
@@ -347,8 +510,7 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage("§7Authors: " + authors);
         sender.sendMessage("§7Running on: " + plugin.getServer().getName() + " " + plugin.getServer().getVersion());
     }
-    
-    @Override
+      @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
         
@@ -371,7 +533,7 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             String subCommand = args[0].toLowerCase();
             
             if ("admin".equals(subCommand) && sender.hasPermission("crysisshot.admin")) {
-                List<String> adminCommands = Arrays.asList("reload", "create", "delete", "enable", "disable");
+                List<String> adminCommands = Arrays.asList("reload", "setup");
                 String partial = args[1].toLowerCase();
                 
                 for (String adminCommand : adminCommands) {
@@ -387,6 +549,47 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
                 for (String language : languages) {
                     if (language.startsWith(partial)) {
                         completions.add(language);
+                    }
+                }
+            }
+        } else if (args.length == 3) {
+            String subCommand = args[0].toLowerCase();
+            String secondCommand = args[1].toLowerCase();
+            
+            if ("admin".equals(subCommand) && "setup".equals(secondCommand) && sender.hasPermission("crysisshot.admin.setup")) {
+                List<String> setupCommands = Arrays.asList("start", "end", "finish", "cancel", "gui", "test", "list", "help");
+                
+                // Add setup mode commands if player is in setup mode
+                if (sender instanceof Player && arenaSetupManager.isInSetupMode((Player) sender)) {
+                    setupCommands = new ArrayList<>(setupCommands);
+                    setupCommands.addAll(Arrays.asList("lobby", "spectator", "spawn", "powerup", "bounds", "theme", "players", "validate", "info"));
+                }
+                
+                String partial = args[2].toLowerCase();
+                for (String setupCommand : setupCommands) {
+                    if (setupCommand.startsWith(partial)) {
+                        completions.add(setupCommand);
+                    }
+                }
+            }
+        } else if (args.length == 4) {
+            String subCommand = args[0].toLowerCase();
+            String secondCommand = args[1].toLowerCase();
+            String thirdCommand = args[2].toLowerCase();
+            
+            if ("admin".equals(subCommand) && "setup".equals(secondCommand) && sender.hasPermission("crysisshot.admin.setup")) {
+                if ("spawn".equals(thirdCommand) || "powerup".equals(thirdCommand)) {
+                    completions.addAll(Arrays.asList("add", "remove"));
+                } else if ("bounds".equals(thirdCommand)) {
+                    completions.addAll(Arrays.asList("min", "max"));
+                } else if ("theme".equals(thirdCommand)) {
+                    for (Arena.Theme theme : Arena.Theme.values()) {
+                        completions.add(theme.name().toLowerCase());
+                    }
+                } else if ("test".equals(thirdCommand)) {
+                    // Add available arena names
+                    for (Arena arena : plugin.getArenaManager().getAllArenas()) {
+                        completions.add(arena.getName());
                     }
                 }
             }

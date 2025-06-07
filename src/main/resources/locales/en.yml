@@ -89,22 +89,57 @@ messages:
       spawns-too-close: "Spawn points too close: {distance} < {minimum}"
       spawns-too-far: "Spawn points too far: {distance} > {maximum}"
       insufficient-powerups: "Not enough power-up locations (minimum: {required})"
-    
-    # Setup messages
+      # Setup messages
     setup:
       started: "<green>Arena setup mode started for: <yellow>{arena}</yellow>"
       cancelled: "<red>Arena setup cancelled"
       saved: "<green>Arena <yellow>{arena}</yellow> saved successfully!"
+      already-in-setup: "<red>You are already in setup mode!"
+      not-in-setup: "<red>You are not in setup mode!"
+      not-in-setup-for-command: "<red>You need to be in setup mode to use this command!"
+      creating-new: "<green>Creating new arena: <yellow>{arena}</yellow>"
+      editing-existing: "<yellow>Editing existing arena: <yellow>{arena}</yellow>"
+      
       lobby-set: "<green>Lobby spawn point set!"
       spectator-set: "<green>Spectator spawn point set!"
       spawn-added: "<green>Spawn point added! Total: <yellow>{count}</yellow>"
       spawn-removed: "<red>Spawn point removed! Total: <yellow>{count}</yellow>"
+      no-spawns: "<red>No spawn points to remove!"
+      spawn-usage: "<yellow>Usage: /cs admin setup spawn <add|remove>"
+      
       powerup-added: "<green>Power-up location added! Total: <yellow>{count}</yellow>"
       powerup-removed: "<red>Power-up location removed! Total: <yellow>{count}</yellow>"
-      bounds-set: "<green>Arena boundaries set!"
+      no-powerups: "<red>No power-up locations to remove!"
+      powerup-usage: "<yellow>Usage: /cs admin setup powerup <add|remove>"
+      
+      bounds-min-set: "<green>Arena minimum boundary set!"
+      bounds-max-set: "<green>Arena maximum boundary set!"
+      bounds-usage: "<yellow>Usage: /cs admin setup bounds <min|max>"
+      
       theme-set: "<green>Arena theme set to: <yellow>{theme}</yellow>"
-      validation-passed: "<green>Arena validation passed!"
+      theme-usage: "<yellow>Usage: /cs admin setup theme <theme>"
+      invalid-theme: "<red>Invalid theme! Available themes: CLASSIC, MODERN, MEDIEVAL, FUTURISTIC, DESERT, WINTER"
+      
+      players-set: "<green>Player limits set: <yellow>{min}</yellow>-<yellow>{max}</yellow>"
+      players-usage: "<yellow>Usage: /cs admin setup players <min> <max>"
+      invalid-number: "<red>Invalid number format!"
+      
+      start-usage: "<yellow>Usage: /cs admin setup start <arena_name>"
+      
+      validation-passed: "<green>Arena <yellow>{arena}</yellow> validation passed!"
       validation-failed: "<red>Arena validation failed: {errors}"
+      
+    test:
+      usage: "<yellow>Usage: /cs admin setup test <arena_name>"
+      started: "<green>Testing arena: <yellow>{arena}</yellow>. You have been teleported to the lobby."
+      validation-failed: "<red>Cannot test arena <yellow>{arena}</yellow>: {errors}"
+      no-lobby: "<red>Arena <yellow>{arena}</yellow> has no lobby spawn point!"
+      
+    list:
+      empty: "<yellow>No arenas configured!"
+      header: "<yellow>----- <gold>Configured Arenas</gold> -----"
+      
+    not-exists: "<red>Arena <yellow>{arena}</yellow> does not exist!"
       
   # Statistics messages
   stats:
@@ -145,8 +180,7 @@ messages:
   # Info messages
   info:
     left-queue: "<yellow>You left the queue"
-    
-  # Commands
+      # Commands
   commands:
     help:
       header: "<yellow>----- <gold>CrysisShot Commands</gold> -----"
@@ -157,6 +191,30 @@ messages:
       leaderboard: "<gray>/cs top</gray> - View leaderboard"
       language: "<gray>/cs lang <language></gray> - Change language"
       admin: "<gray>/cs admin</gray> - Admin commands"
+      
+    admin-help:
+      header: "<yellow>----- <gold>Admin Commands</gold> -----"
+      setup: "<gray>/cs admin setup</gray> - Arena setup commands"
+      reload: "<gray>/cs admin reload</gray> - Reload plugin configuration"
+      
+    setup-help:
+      header: "<yellow>----- <gold>Arena Setup Commands</gold> -----"
+      start: "<gray>/cs admin setup start <arena></gray> - Start arena setup"
+      end: "<gray>/cs admin setup end</gray> - Finish and save arena setup"
+      cancel: "<gray>/cs admin setup cancel</gray> - Cancel arena setup"
+      gui: "<gray>/cs admin setup gui</gray> - Open setup GUI"
+      test: "<gray>/cs admin setup test <arena></gray> - Test an arena"
+      list: "<gray>/cs admin setup list</gray> - List all arenas"
+      in-setup-header: "<green>----- <gold>Setup Mode Commands</gold> -----"
+      lobby: "<gray>/cs admin setup lobby</gray> - Set lobby spawn"
+      spectator: "<gray>/cs admin setup spectator</gray> - Set spectator spawn"
+      spawn: "<gray>/cs admin setup spawn <add|remove></gray> - Manage spawn points"
+      powerup: "<gray>/cs admin setup powerup <add|remove></gray> - Manage power-up locations"
+      bounds: "<gray>/cs admin setup bounds <min|max></gray> - Set arena boundaries"
+      theme: "<gray>/cs admin setup theme <theme></gray> - Set arena theme"
+      players: "<gray>/cs admin setup players <min> <max></gray> - Set player limits"
+      validate: "<gray>/cs admin setup validate</gray> - Validate current arena"
+      info: "<gray>/cs admin setup info</gray> - Show arena information"
       
     no-permission: "<red>You don't have permission to use this command!"
     invalid-args: "<red>Invalid arguments! Usage: {usage}"
