@@ -9,23 +9,34 @@ import java.util.Map;
  * Represents a CrysisShot arena with all necessary configuration and properties
  */
 public class Arena {
-    
-    /**
+      /**
      * Arena themes for different visual styles
      */
     public enum Theme {
-        URBAN("Urban"),
-        HOSPITAL("Hospital"),
-        TEMPLE("Temple");
+        CLASSIC("Classic", "§7A traditional arena setting"),
+        MODERN("Modern", "§bA sleek, contemporary environment"),
+        MEDIEVAL("Medieval", "§6Ancient castle and fortress style"),
+        FUTURISTIC("Futuristic", "§aCyber-tech advanced setting"),
+        DESERT("Desert", "§eArid wasteland environment"),
+        WINTER("Winter", "§fFrozen tundra landscape"),
+        URBAN("Urban", "§8City streets and buildings"),
+        HOSPITAL("Hospital", "§fSterile medical facility"),
+        TEMPLE("Temple", "§dMystical ancient temple");
         
         private final String displayName;
+        private final String description;
         
-        Theme(String displayName) {
+        Theme(String displayName, String description) {
             this.displayName = displayName;
+            this.description = description;
         }
         
         public String getDisplayName() {
             return displayName;
+        }
+        
+        public String getDescription() {
+            return description;
         }
         
         public static Theme fromString(String theme) {
@@ -34,7 +45,7 @@ public class Arena {
                     return t;
                 }
             }
-            return URBAN; // Default fallback
+            return CLASSIC; // Default fallback
         }
     }
     
@@ -87,7 +98,7 @@ public class Arena {
         this.name = name;
         this.displayName = name;
         this.enabled = false;
-        this.theme = Theme.URBAN;
+        this.theme = Theme.CLASSIC;
         this.state = ArenaState.DISABLED;
         this.minPlayers = 4;
         this.maxPlayers = 16;

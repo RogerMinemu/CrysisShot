@@ -299,13 +299,17 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             case "setup":
                 handleSetupCommands(sender, args);
                 break;
+            
+            case "theme": // Added theme case
+                handleThemeCommands(sender, args);
+                break;
                 
             default:
                 if (sender instanceof Player) {
                     messageManager.sendMessage((Player) sender, "commands.invalid-args", 
-                        "usage", "/cs admin <reload|setup>");
+                        "usage", "/cs admin <reload|setup|theme>"); // Updated usage
                 } else {
-                    sender.sendMessage("Invalid admin command! Use: reload, setup");
+                    sender.sendMessage("Invalid admin command! Use: reload, setup, theme"); // Updated usage
                 }
                 break;
         }
@@ -317,10 +321,12 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             messageManager.sendMessage(player, "commands.admin-help.header");
             messageManager.sendMessage(player, "commands.admin-help.reload");
             messageManager.sendMessage(player, "commands.admin-help.setup");
+            messageManager.sendMessage(player, "commands.admin-help.theme"); // Added theme help
         } else {
             sender.sendMessage("§6--- CrysisShot Admin Commands ---");
             sender.sendMessage("§e/cs admin reload §7- Reload plugin configuration");
             sender.sendMessage("§e/cs admin setup <command> §7- Arena setup commands");
+            sender.sendMessage("§e/cs admin theme <command> §7- Arena theme commands"); // Added theme help
             sender.sendMessage("§e/cs admin setup help §7- Show setup command help");
         }
     }
@@ -501,7 +507,146 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
             }
         }
     }
-      private void showVersion(CommandSender sender) {
+    
+    private void handleThemeCommands(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Theme commands can only be used by players!");
+            return;
+        }
+        
+        Player player = (Player) sender;
+        
+        if (!player.hasPermission("crysisshot.admin.theme")) {
+            messageManager.sendMessage(player, "commands.no-permission");
+            return;
+        }
+        
+        if (args.length < 3) {
+            showThemeCommandHelp(player);
+            return;
+        }
+        
+        String themeCommand = args[2].toLowerCase();
+        
+        switch (themeCommand) {
+            case "preview":
+                handleThemePreview(player, args);
+                break;
+                
+            case "guidelines":
+                handleThemeGuidelines(player, args);
+                break;
+                
+            case "effects":
+                handleThemeEffects(player, args);
+                break;
+                
+            default:
+                showThemeCommandHelp(player);
+                break;
+        }
+    }
+    
+    private void showThemeCommandHelp(Player player) {
+        messageManager.sendMessage(player, "commands.theme-help.header");
+        messageManager.sendMessage(player, "commands.theme-help.preview");
+        messageManager.sendMessage(player, "commands.theme-help.guidelines");
+        messageManager.sendMessage(player, "commands.theme-help.effects");
+    }
+    
+    private void handleThemePreview(Player player, String[] args) {
+        if (args.length < 4) {
+            messageManager.sendMessage(player, "arena.theme.preview-usage");
+            return;
+        }
+        
+        String themeName = args[3].toUpperCase();
+        
+        try {
+            Arena.Theme theme = Arena.Theme.valueOf(themeName);
+            
+            messageManager.sendMessage(player, "arena.theme.preview-header", "theme", theme.getDisplayName());
+            
+            // Send theme description
+            String descriptionKey = "arena.theme." + theme.name().toLowerCase() + "-desc";
+            messageManager.sendMessage(player, descriptionKey); // Use the direct key for description
+            
+            // Show building materials
+            plugin.getArenaThemeManager().showThemePreview(player, theme);
+            
+        } catch (IllegalArgumentException e) {
+            String availableThemes = String.join(", ", getAvailableThemes());
+            messageManager.sendMessage(player, "arena.theme.invalid-theme", "themes", availableThemes);
+        }
+    }
+    
+    private void handleThemeGuidelines(Player player, String[] args) {
+        if (args.length < 4) {
+            messageManager.sendMessage(player, "arena.theme.guidelines-usage");
+            return;
+        }
+        
+        String themeName = args[3].toUpperCase();
+        
+        try {
+            Arena.Theme theme = Arena.Theme.valueOf(themeName);
+            
+            messageManager.sendMessage(player, "arena.theme.guidelines-header", "theme", theme.getDisplayName());
+            
+            // Get building guidelines from the theme manager
+            List<String> guidelines = plugin.getArenaThemeManager().getBuildingGuidelines(theme);
+            for (String guideline : guidelines) {
+                player.sendMessage(guideline); // Guidelines are already formatted with color codes
+            }
+            
+        } catch (IllegalArgumentException e) {
+            String availableThemes = String.join(", ", getAvailableThemes());
+            messageManager.sendMessage(player, "arena.theme.invalid-theme", "themes", availableThemes);
+        }
+    }
+    
+    private void handleThemeEffects(Player player, String[] args) {
+        if (args.length < 5) {
+            messageManager.sendMessage(player, "commands.theme-effects-usage"); // Added new message key
+            return;
+        }
+        
+        String action = args[3].toLowerCase();
+        String arenaName = args[4];
+        
+        Arena arena = plugin.getArenaManager().getArena(arenaName);
+        if (arena == null) {
+            messageManager.sendMessage(player, "arena.not-exists", "arena", arenaName);
+            return;
+        }
+        
+        switch (action) {
+            case "start":
+                plugin.getArenaThemeManager().startThemeEffects(arena);
+                messageManager.sendMessage(player, "arena.theme.effects-started", "arena", arenaName);
+                break;
+                
+            case "stop":
+                plugin.getArenaThemeManager().stopThemeEffects(arena);
+                messageManager.sendMessage(player, "arena.theme.effects-stopped", "arena", arenaName);
+                break;
+                
+            default:
+                messageManager.sendMessage(player, "commands.theme-effects-usage"); // Added new message key
+                break;
+        }
+    }
+    
+    private String[] getAvailableThemes() {
+        Arena.Theme[] themes = Arena.Theme.values();
+        String[] themeNames = new String[themes.length];
+        for (int i = 0; i < themes.length; i++) {
+            themeNames[i] = themes[i].name();
+        }
+        return themeNames;
+    }
+
+    private void showVersion(CommandSender sender) {
         // Use PluginMeta instead of deprecated getDescription()
         String version = plugin.getPluginMeta().getVersion();
         String authors = String.join(", ", plugin.getPluginMeta().getAuthors());
@@ -513,83 +658,148 @@ public class CrysisShotCommand implements CommandExecutor, TabCompleter {
       @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
-        
+        String partial = args[args.length - 1].toLowerCase();
+
         if (args.length == 1) {
             // Main subcommands
-            List<String> subCommands = Arrays.asList("help", "join", "leave", "stats", "top", "lang", "version");
+            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "join", "leave", "stats", "top", "lang", "version", "queue"));
             
             if (sender.hasPermission("crysisshot.admin")) {
-                subCommands = new ArrayList<>(subCommands);
                 subCommands.addAll(Arrays.asList("admin", "reload"));
             }
             
-            String partial = args[0].toLowerCase();
-            for (String subCommand : subCommands) {
-                if (subCommand.startsWith(partial)) {
-                    completions.add(subCommand);
+            for (String subCmd : subCommands) {
+                if (subCmd.startsWith(partial)) {
+                    completions.add(subCmd);
                 }
             }
         } else if (args.length == 2) {
-            String subCommand = args[0].toLowerCase();
+            String mainCommand = args[0].toLowerCase();
             
-            if ("admin".equals(subCommand) && sender.hasPermission("crysisshot.admin")) {
-                List<String> adminCommands = Arrays.asList("reload", "setup");
-                String partial = args[1].toLowerCase();
-                
+            if ("admin".equals(mainCommand) && sender.hasPermission("crysisshot.admin")) {
+                List<String> adminCommands = Arrays.asList("reload", "setup", "theme"); // Added "theme"
                 for (String adminCommand : adminCommands) {
                     if (adminCommand.startsWith(partial)) {
                         completions.add(adminCommand);
                     }
                 }
-            } else if ("lang".equals(subCommand) || "language".equals(subCommand)) {
+            } else if ("lang".equals(mainCommand) || "language".equals(mainCommand)) {
                 // TODO: Get available languages from MessageManager
-                List<String> languages = Arrays.asList("en", "es", "fr", "de");
-                String partial = args[1].toLowerCase();
-                
+                List<String> languages = Arrays.asList("en", "es", "fr", "de"); // Example languages
                 for (String language : languages) {
                     if (language.startsWith(partial)) {
                         completions.add(language);
                     }
                 }
+            } else if ("queue".equals(mainCommand) && sender.hasPermission("crysisshot.queue")) {
+                 List<String> queueCommands = Arrays.asList("join", "leave", "status");
+                 for (String queueCmd : queueCommands) {
+                     if (queueCmd.startsWith(partial)) {
+                         completions.add(queueCmd);
+                     }
+                 }
             }
         } else if (args.length == 3) {
-            String subCommand = args[0].toLowerCase();
-            String secondCommand = args[1].toLowerCase();
+            String mainCommand = args[0].toLowerCase();
+            String subCommand = args[1].toLowerCase();
             
-            if ("admin".equals(subCommand) && "setup".equals(secondCommand) && sender.hasPermission("crysisshot.admin.setup")) {
-                List<String> setupCommands = Arrays.asList("start", "end", "finish", "cancel", "gui", "test", "list", "help");
-                
-                // Add setup mode commands if player is in setup mode
-                if (sender instanceof Player && arenaSetupManager.isInSetupMode((Player) sender)) {
-                    setupCommands = new ArrayList<>(setupCommands);
-                    setupCommands.addAll(Arrays.asList("lobby", "spectator", "spawn", "powerup", "bounds", "theme", "players", "validate", "info"));
-                }
-                
-                String partial = args[2].toLowerCase();
-                for (String setupCommand : setupCommands) {
-                    if (setupCommand.startsWith(partial)) {
-                        completions.add(setupCommand);
+            if ("admin".equals(mainCommand) && sender.hasPermission("crysisshot.admin")) {
+                if ("setup".equals(subCommand) && sender.hasPermission("crysisshot.admin.setup")) {
+                    List<String> setupCommands = new ArrayList<>(Arrays.asList("start", "end", "finish", "cancel", "gui", "test", "list", "help"));
+                    if (sender instanceof Player && arenaSetupManager.isInSetupMode((Player) sender)) {
+                        setupCommands.addAll(Arrays.asList("lobby", "spectator", "spawn", "powerup", "bounds", "theme", "players", "validate", "info"));
+                    }
+                    for (String setupCmd : setupCommands) {
+                        if (setupCmd.startsWith(partial)) {
+                            completions.add(setupCmd);
+                        }
+                    }
+                } else if ("theme".equals(subCommand) && sender.hasPermission("crysisshot.admin.theme")) {
+                    List<String> themeCommands = Arrays.asList("preview", "guidelines", "effects", "help");
+                    for (String themeCmd : themeCommands) {
+                        if (themeCmd.startsWith(partial)) {
+                            completions.add(themeCmd);
+                        }
                     }
                 }
             }
         } else if (args.length == 4) {
-            String subCommand = args[0].toLowerCase();
-            String secondCommand = args[1].toLowerCase();
-            String thirdCommand = args[2].toLowerCase();
-            
-            if ("admin".equals(subCommand) && "setup".equals(secondCommand) && sender.hasPermission("crysisshot.admin.setup")) {
-                if ("spawn".equals(thirdCommand) || "powerup".equals(thirdCommand)) {
-                    completions.addAll(Arrays.asList("add", "remove"));
-                } else if ("bounds".equals(thirdCommand)) {
-                    completions.addAll(Arrays.asList("min", "max"));
-                } else if ("theme".equals(thirdCommand)) {
-                    for (Arena.Theme theme : Arena.Theme.values()) {
-                        completions.add(theme.name().toLowerCase());
+            String mainCommand = args[0].toLowerCase();
+            String subCommand = args[1].toLowerCase();
+            String actionCommand = args[2].toLowerCase();
+
+            if ("admin".equals(mainCommand) && sender.hasPermission("crysisshot.admin")) {
+                if ("setup".equals(subCommand) && sender.hasPermission("crysisshot.admin.setup")) {
+                    if ("start".equals(actionCommand) || "test".equals(actionCommand)) {
+                        // Suggest arena names for start/test
+                        for (Arena arena : plugin.getArenaManager().getAllArenas()) {
+                            if (arena.getName().toLowerCase().startsWith(partial)) {
+                                completions.add(arena.getName());
+                            }
+                        }
+                         if ("new_arena_name".startsWith(partial) && "start".equals(actionCommand)) { // Suggest a placeholder for new arena
+                            completions.add("new_arena_name");
+                        }
+                    } else if ("spawn".equals(actionCommand) || "powerup".equals(actionCommand)) {
+                        List<String> addRemove = Arrays.asList("add", "remove");
+                        for (String arCmd : addRemove) {
+                            if (arCmd.startsWith(partial)) {
+                                completions.add(arCmd);
+                            }
+                        }
+                    } else if ("bounds".equals(actionCommand)) {
+                        List<String> minMax = Arrays.asList("min", "max");
+                        for (String mmCmd : minMax) {
+                            if (mmCmd.startsWith(partial)) {
+                                completions.add(mmCmd);
+                            }
+                        }
+                    } else if ("theme".equals(actionCommand)) {
+                        for (Arena.Theme theme : Arena.Theme.values()) {
+                            if (theme.name().toLowerCase().startsWith(partial)) {
+                                completions.add(theme.name().toLowerCase());
+                            }
+                        }
+                    } else if ("players".equals(actionCommand)) {
+                        if ("<min_players>".startsWith(partial)) {
+                             completions.add("<min_players>");
+                        }
                     }
-                } else if ("test".equals(thirdCommand)) {
-                    // Add available arena names
-                    for (Arena arena : plugin.getArenaManager().getAllArenas()) {
-                        completions.add(arena.getName());
+                } else if ("theme".equals(subCommand) && sender.hasPermission("crysisshot.admin.theme")) {
+                    if ("preview".equals(actionCommand) || "guidelines".equals(actionCommand)) {
+                        for (Arena.Theme theme : Arena.Theme.values()) {
+                            if (theme.name().toLowerCase().startsWith(partial)) {
+                                completions.add(theme.name().toLowerCase());
+                            }
+                        }
+                    } else if ("effects".equals(actionCommand)) {
+                        List<String> startStop = Arrays.asList("start", "stop");
+                        for (String ssCmd : startStop) {
+                            if (ssCmd.startsWith(partial)) {
+                                completions.add(ssCmd);
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (args.length == 5) {
+            String mainCommand = args[0].toLowerCase();
+            String subCommand = args[1].toLowerCase();
+            String actionCommand = args[2].toLowerCase();
+            String fourthArg = args[3].toLowerCase();
+
+            if ("admin".equals(mainCommand) && sender.hasPermission("crysisshot.admin")) {
+                if ("setup".equals(subCommand) && "players".equals(actionCommand) && sender.hasPermission("crysisshot.admin.setup")) {
+                     if ("<max_players>".startsWith(partial)) {
+                        completions.add("<max_players>");
+                    }
+                } else if ("theme".equals(subCommand) && "effects".equals(actionCommand) && sender.hasPermission("crysisshot.admin.theme")) {
+                    if ("start".equals(fourthArg) || "stop".equals(fourthArg)) {
+                        for (Arena arena : plugin.getArenaManager().getAllArenas()) {
+                            if (arena.getName().toLowerCase().startsWith(partial)) {
+                                completions.add(arena.getName());
+                            }
+                        }
                     }
                 }
             }

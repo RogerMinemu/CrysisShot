@@ -2,6 +2,7 @@ package com.crysisshot;
 
 import com.crysisshot.arena.ArenaManager;
 import com.crysisshot.arena.ArenaSetupManager;
+import com.crysisshot.arena.ArenaThemeManager;
 import com.crysisshot.commands.CrysisShotCommand;
 import com.crysisshot.config.ConfigManager;
 import com.crysisshot.database.DatabaseManager;
@@ -23,12 +24,13 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Roger Lebron Serra
  * @version 1.0.0
  */
-public class CrysisShot extends JavaPlugin {    private static CrysisShot instance;      // Core managers
+public class CrysisShot extends JavaPlugin {    private static CrysisShot instance;    // Core managers
     private ConfigManager configManager;
     private MessageManager messageManager;
     private DatabaseManager databaseManager;
     private ArenaManager arenaManager;
     private ArenaSetupManager arenaSetupManager;
+    private ArenaThemeManager arenaThemeManager;
     private GameManager gameManager;
     // private EconomyManager economyManager;
     
@@ -112,12 +114,14 @@ public class CrysisShot extends JavaPlugin {    private static CrysisShot instan
         databaseManager = new DatabaseManager(this);
         if (!databaseManager.initialize()) {
             throw new RuntimeException("Failed to initialize database");
-        }
-          // Arena manager (depends on config and message managers)
+        }        // Arena manager (depends on config and message managers)
         arenaManager = new ArenaManager(this);
         
         // Arena setup manager (depends on arena manager)
         arenaSetupManager = new ArenaSetupManager(this);
+        
+        // Arena theme manager (depends on arena manager)
+        arenaThemeManager = new ArenaThemeManager(this);
         
         // Game manager (depends on database and config)
         gameManager = new GameManager(this);
@@ -226,7 +230,11 @@ public class CrysisShot extends JavaPlugin {    private static CrysisShot instan
     public ArenaSetupManager getArenaSetupManager() {
         return arenaSetupManager;
     }
-    
+
+    public ArenaThemeManager getArenaThemeManager() { // Added public getter for ArenaThemeManager
+        return arenaThemeManager;
+    }
+
     /**
      * Get the game manager
      */

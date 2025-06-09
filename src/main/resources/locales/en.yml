@@ -118,16 +118,114 @@ messages:
       
       theme-set: "<green>Arena theme set to: <yellow>{theme}</yellow>"
       theme-usage: "<yellow>Usage: /cs admin setup theme <theme>"
-      invalid-theme: "<red>Invalid theme! Available themes: CLASSIC, MODERN, MEDIEVAL, FUTURISTIC, DESERT, WINTER"
+      invalid-theme: "<red>Invalid theme! Available themes: CLASSIC, MODERN, MEDIEVAL, FUTURISTIC, DESERT, WINTER, URBAN, HOSPITAL, TEMPLE"
       
-      players-set: "<green>Player limits set: <yellow>{min}</yellow>-<yellow>{max}</yellow>"
-      players-usage: "<yellow>Usage: /cs admin setup players <min> <max>"
-      invalid-number: "<red>Invalid number format!"
+      # Theme preview and guidelines
+      theme-preview: "<gold>{theme}</gold> - <gray>{description}</gray>"
+      classic-desc: "Traditional medieval fortress with cobblestone and torches"
+      modern-desc: "Sleek contemporary design with glass and steel elements"
+      medieval-desc: "Dark castle theme with stone walls and wooden accents"
+      futuristic-desc: "High-tech environment with neon lights and metallic surfaces"
+      desert-desc: "Sandy environment with sandstone and terracotta structures"
+      winter-desc: "Frozen landscape with ice and snow blocks"
+      urban-desc: "Cityscape with concrete buildings and glass windows"
+      hospital-desc: "Clean medical facility with white walls and sterile lighting"
+      temple-desc: "Mystical purple temple with enchanted decorations"
       
-      start-usage: "<yellow>Usage: /cs admin setup start <arena_name>"
+    # Theme commands
+    theme:
+      preview-usage: "<yellow>Usage: /cs admin theme preview <theme_name>"
+      guidelines-usage: "<yellow>Usage: /cs admin theme guidelines <theme_name>"
+      effects-usage: "<yellow>Usage: /cs admin theme effects <start|stop> <arena_name>"
+      invalid-theme: "<red>Invalid theme! Available themes: {themes}"
+      preview-header: "<gold>--- Theme Preview: {theme} ---</gold>"
+      guidelines-header: "<gold>--- Building Guidelines: {theme} ---</gold>"
+      effects-started: "<green>Theme effects started for arena: <yellow>{arena}</yellow>"
+      effects-stopped: "<yellow>Theme effects stopped for arena: <yellow>{arena}</yellow>"
       
-      validation-passed: "<green>Arena <yellow>{arena}</yellow> validation passed!"
-      validation-failed: "<red>Arena validation failed: {errors}"
+      # Theme descriptions
+      classic-desc: "Traditional medieval fortress with cobblestone and torches"
+      modern-desc: "Sleek contemporary design with glass and steel elements"
+      medieval-desc: "Dark castle theme with stone walls and wooden accents"
+      futuristic-desc: "High-tech environment with neon lights and metallic surfaces"
+      desert-desc: "Sandy environment with sandstone and terracotta structures"
+      winter-desc: "Frozen landscape with ice and snow blocks"
+      urban-desc: "Cityscape with concrete buildings and glass windows"
+      hospital-desc: "Clean medical facility with white walls and sterile lighting"
+      temple-desc: "Mystical purple temple with enchanted decorations"
+      
+      # Building guidelines
+      classic-guidelines: |
+        <yellow>Classic Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Cobblestone</white>
+        <gray>• Accent Material:</gray> <white>Stone Bricks</white>
+        <gray>• Lighting:</gray> <white>Torches, Lanterns</white>
+        <gray>• Style:</gray> <white>Medieval fortress, rustic</white>
+        <gray>• Colors:</gray> <white>Earth tones, gray, brown</white>
+        
+      modern-guidelines: |
+        <yellow>Modern Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Quartz Block</white>
+        <gray>• Accent Material:</gray> <white>Iron Block</white>
+        <gray>• Lighting:</gray> <white>Sea Lanterns, Glowstone</white>
+        <gray>• Style:</gray> <white>Clean lines, geometric shapes</white>
+        <gray>• Colors:</gray> <white>White, blue, silver</white>
+        
+      medieval-guidelines: |
+        <yellow>Medieval Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Stone</white>
+        <gray>• Accent Material:</gray> <white>Dark Oak Log</white>
+        <gray>• Lighting:</gray> <white>Torches, Campfires</white>
+        <gray>• Style:</gray> <white>Castle walls, towers</white>
+        <gray>• Colors:</gray> <white>Gray, brown, dark tones</white>
+        
+      futuristic-guidelines: |
+        <yellow>Futuristic Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Prismarine</white>
+        <gray>• Accent Material:</gray> <white>Sea Lantern</white>
+        <gray>• Lighting:</gray> <white>Beacons, Sea Lanterns</white>
+        <gray>• Style:</gray> <white>Sci-fi, holographic effects</white>
+        <gray>• Colors:</gray> <white>Cyan, lime, electric blue</white>
+        
+      desert-guidelines: |
+        <yellow>Desert Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Sandstone</white>
+        <gray>• Accent Material:</gray> <white>Terracotta</white>
+        <gray>• Lighting:</gray> <white>Torches, Lanterns</white>
+        <gray>• Style:</gray> <white>Middle Eastern, adobe</white>
+        <gray>• Colors:</gray> <white>Yellow, orange, brown</white>
+        
+      winter-guidelines: |
+        <yellow>Winter Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Snow Block</white>
+        <gray>• Accent Material:</gray> <white>Ice</white>
+        <gray>• Lighting:</gray> <white>Torches, Jack o'Lanterns</white>
+        <gray>• Style:</gray> <white>Frozen fortress, ice castle</white>
+        <gray>• Colors:</gray> <white>White, light blue, silver</white>
+        
+      urban-guidelines: |
+        <yellow>Urban Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Gray Concrete</white>
+        <gray>• Accent Material:</gray> <white>Glass</white>
+        <gray>• Lighting:</gray> <white>Redstone Lamps, Glowstone</white>
+        <gray>• Style:</gray> <white>Modern city, skyscrapers</white>
+        <gray>• Colors:</gray> <white>Gray, black, neon accents</white>
+        
+      hospital-guidelines: |
+        <yellow>Hospital Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>White Concrete</white>
+        <gray>• Accent Material:</gray> <white>White Glazed Terracotta</white>
+        <gray>• Lighting:</gray> <white>Sea Lanterns, Glowstone</white>
+        <gray>• Style:</gray> <white>Clean, sterile, medical</white>
+        <gray>• Colors:</gray> <white>White, light gray, blue accents</white>
+        
+      temple-guidelines: |
+        <yellow>Temple Theme Building Guidelines:</yellow>
+        <gray>• Primary Material:</gray> <white>Purpur Block</white>
+        <gray>• Accent Material:</gray> <white>End Stone Bricks</white>
+        <gray>• Lighting:</gray> <white>End Rods, Torches</white>
+        <gray>• Style:</gray> <white>Mystical, ancient temple</white>
+        <gray>• Colors:</gray> <white>Purple, magenta, gold accents</white>
       
     test:
       usage: "<yellow>Usage: /cs admin setup test <arena_name>"
