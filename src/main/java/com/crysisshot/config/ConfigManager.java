@@ -19,19 +19,21 @@ public class ConfigManager {
     private final CrysisShot plugin;
     private FileConfiguration config;
     private FileConfiguration arenasConfig;
+    private FileConfiguration messagesConfig; // Assuming you might add this later based on MessageManager
     
     // Configuration file objects
     private File configFile;
     private File arenasFile;
+    private File messagesFile; // Assuming you might add this later
     
     public ConfigManager(CrysisShot plugin) {
         this.plugin = plugin;
     }
     
     /**
-     * Load all configuration files
+     * Initialize and load all configuration files
      */
-    public void loadConfigurations() {
+    public void initialize() { // Renamed from loadConfigurations
         try {
             // Create plugin folder if it doesn't exist
             if (!plugin.getDataFolder().exists()) {
@@ -43,6 +45,9 @@ public class ConfigManager {
             
             // Load arenas config
             loadArenasConfig();
+
+            // Future: Load messages config if you create a separate one
+            // loadMessagesConfig(); 
             
             Logger.info("Configuration files loaded successfully!");
             
@@ -198,47 +203,119 @@ public class ConfigManager {
             config.save(configFile);
         } catch (IOException e) {
             Logger.severe("Failed to save config.yml: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
+
     /**
-     * Save arenas configuration file
+     * Reloads the main configuration file.
      */
-    public void saveArenasConfig() {
+    public void reloadConfig() {
         try {
-            arenasConfig.save(arenasFile);
+            loadMainConfig();
+            Logger.info("config.yml reloaded successfully!");
         } catch (IOException e) {
-            Logger.severe("Failed to save arenas.yml: " + e.getMessage());
+            Logger.severe("Failed to reload config.yml: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
-    // Getter methods for configuration values
+    // Getter methods for main config
+    
     public FileConfiguration getConfig() {
         return config;
     }
+    
+    public String getString(String path) {
+        return config.getString(path);
+    }
+    
+    public String getString(String path, String def) {
+        return config.getString(path, def);
+    }
+    
+    public int getInt(String path) {
+        return config.getInt(path);
+    }
+    
+    public int getInt(String path, int def) {
+        return config.getInt(path, def);
+    }
+    
+    public boolean getBoolean(String path) {
+        return config.getBoolean(path);
+    }
+    
+    public boolean getBoolean(String path, boolean def) {
+        return config.getBoolean(path, def);
+    }
+    
+    public List<String> getStringList(String path) {
+        return config.getStringList(path);
+    }
+
+    public org.bukkit.configuration.ConfigurationSection getSection(String path) {
+        return config.getConfigurationSection(path);
+    }
+    
+    // Getter methods for arenas config
     
     public FileConfiguration getArenasConfig() {
         return arenasConfig;
     }
     
-    // Game settings
+    // Future: Getter methods for messages config
+    // public FileConfiguration getMessagesConfig() {
+    //     return messagesConfig;
+    // }
+    
+    // Example of how you might load a separate messages.yml, if you decide to
+    /*
+    private void loadMessagesConfig() throws IOException {
+        messagesFile = new File(plugin.getDataFolder(), "messages.yml");
+        if (!messagesFile.exists()) {
+            saveDefaultConfig("messages.yml");
+        }
+        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+    }
+    */
+    
+    // Specific getter methods for common config values
+    
+    public String getDefaultLanguage() {
+        return getString("locale.default-language", "en");
+    }
+    
+    public List<String> getSupportedLanguages() {
+        return getStringList("locale.supported-languages");
+    }
+    
     public int getTargetScore() {
-        return config.getInt("game.target-score", 20);
+        return getInt("game.target-score", 20);
     }
     
     public int getMaxPlayers() {
-        return config.getInt("game.max-players", 16);
+        return getInt("game.max-players", 16);
     }
     
     public int getMinPlayers() {
-        return config.getInt("game.min-players", 4);
+        return getInt("game.min-players", 4);
     }
-      public int getRespawnDelay() {
-        return config.getInt("game.respawn-delay", 3);
+    
+    public int getMinPlayersPerSession() {
+        return getMinPlayers();
+    }
+    
+    public int getMaxPlayersPerSession() {
+        return getMaxPlayers();
+    }
+    
+    public int getRespawnDelay() {
+        return getInt("game.respawn-delay", 3);
     }
     
     public int getStartingArrows() {
-        return config.getInt("game.starting-arrows", 1);
+        return getInt("game.starting-arrows", 1);
     }
     
     public List<Integer> getComboThresholds() {
@@ -249,57 +326,7 @@ public class ConfigManager {
         return config.getIntegerList("game.combo-multipliers");
     }
     
-    // Power-up settings
-    public boolean arePowerupsEnabled() {
-        return config.getBoolean("powerups.enabled", true);
-    }
-    
-    public int getPowerupSpawnInterval() {
-        return config.getInt("powerups.spawn-interval", 30);
-    }
-    
-    public int getSpeedDuration() {
-        return config.getInt("powerups.duration.speed", 10);
-    }
-    
-    public int getInvisibilityDuration() {
-        return config.getInt("powerups.duration.invisibility", 7);
-    }
-    
-    // Arena settings
-    public String getArenaSelectionMode() {
-        return config.getString("arenas.selection-mode", "random");
-    }
-    
-    // Locale settings
-    public String getDefaultLanguage() {
-        return config.getString("locale.default-language", "en");
-    }
-    
-    public List<String> getSupportedLanguages() {
-        return config.getStringList("locale.supported-languages");
-    }
-    
-    // Database settings
-    public String getDatabaseType() {
-        return config.getString("database.type", "sqlite");
-    }
-    
-    public String getDatabaseFile() {
-        return config.getString("database.file", "crysisshot.db");
-    }
-    
-    // Debug settings
     public boolean isDebugMode() {
-        return config.getBoolean("debug.enabled", false);
-    }
-    
-    // Session-specific methods for matchmaking
-    public int getMinPlayersPerSession() {
-        return getMinPlayers();
-    }
-    
-    public int getMaxPlayersPerSession() {
-        return getMaxPlayers();
+        return getBoolean("debug.enabled", false);
     }
 }

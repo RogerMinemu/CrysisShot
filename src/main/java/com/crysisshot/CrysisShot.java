@@ -101,12 +101,11 @@ public class CrysisShot extends JavaPlugin {    private static CrysisShot instan
     /**
      * Initialize all plugin managers
      */
-    private void initializeManagers() {
-        Logger.info("Initializing plugin managers...");
+    private void initializeManagers() {        Logger.info("Initializing plugin managers...");
         
         // Configuration manager (first priority)
         configManager = new ConfigManager(this);
-        configManager.loadConfigurations();
+        configManager.initialize();
         
         // Message manager (depends on config)
         messageManager = new MessageManager(this, configManager);
@@ -182,11 +181,10 @@ public class CrysisShot extends JavaPlugin {    private static CrysisShot instan
      * Reload plugin configuration and managers
      */
     public void reloadPlugin() {
-        try {
-            Logger.info("Reloading CrysisShot plugin...");
+        try {            Logger.info("Reloading CrysisShot plugin...");
             
             // Reload configurations
-            configManager.loadConfigurations();
+            configManager.reloadConfig();
             messageManager.loadMessages();
             
             // TODO: Implement in Step 2.1 when GameManager is available

@@ -1,0 +1,33 @@
+\
+game:
+  target-score: 25
+  max-players: 12
+  min-players: 2
+  respawn-delay: 5
+  starting-arrows: 1
+  default-arena-world: "test_world"
+  combo-thresholds: [3, 6, 9]
+  combo-multipliers: [2, 3, 4]
+  allowed-commands:
+    - "tell"
+    - "msg"
+powerups:
+  enabled: true
+  spawn-interval: 45
+  duration:
+    speed: 15
+    invisibility: 10
+arenas:
+  selection-mode: "random"
+locale:
+  default-language: "en_TEST"
+  supported-languages: ["en_TEST", "es_TEST"]
+database:
+  type: "sqlite_test"
+  file: "crysisshot_test.db"
+debug:
+  enabled: true
+  test-value: "debug-on"
+some-section:
+  key1: "value1"
+  key2: "value2"
