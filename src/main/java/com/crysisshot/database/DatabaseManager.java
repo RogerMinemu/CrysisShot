@@ -69,20 +69,20 @@ public class DatabaseManager {
     public DatabaseManager(CrysisShot plugin) {
         this.plugin = plugin;
     }
-    
     /**
      * Initialize the database connection and create tables
      */
     public boolean initialize() {
         try {
             setupDataSource();
+            initialized = true; // Set this after dataSource is ready but before createTables
             createTables();
-            initialized = true;
             Logger.info("Database initialized successfully");
             return true;
         } catch (Exception e) {
             Logger.severe("Failed to initialize database: " + e.getMessage());
             e.printStackTrace();
+            initialized = false; // Reset on failure
             return false;
         }
     }

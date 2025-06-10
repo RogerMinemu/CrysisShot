@@ -129,16 +129,12 @@
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
-                        </goals>
+                        </goals>                        
                         <configuration>
                             <relocations>
                                 <relocation>
                                     <pattern>com.zaxxer.hikari</pattern>
                                     <shadedPattern>com.crysisshot.libs.hikari</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.sqlite</pattern>
-                                    <shadedPattern>com.crysisshot.libs.sqlite</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.google.gson</pattern>
@@ -155,6 +151,13 @@
                                     </excludes>
                                 </filter>
                             </filters>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Bundle-NativeCode>org/sqlite/native/Windows/x86_64/sqlitejdbc.dll;osname=Win32;processor=x86-64,org/sqlite/native/Linux/x86_64/libsqlitejdbc.so;osname=Linux;processor=x86-64,org/sqlite/native/Mac/x86_64/libsqlitejdbc.jnilib;osname=MacOSX;processor=x86-64</Bundle-NativeCode>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
                         </configuration>
                     </execution>
                 </executions>

@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.crysisshot.CrysisShot
 api-version: '1.20'
 prefix: CrysisShot
-authors: [AI-Developer]
+authors: [RogerMinemu, Claude4]
 description: Competitive PvP minigame plugin - One In The Chamber mode
 website: https://github.com/yourusername/CrysisShot
 
