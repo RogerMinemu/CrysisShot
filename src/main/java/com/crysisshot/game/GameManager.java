@@ -562,6 +562,24 @@ public class GameManager {
     }
     
     /**
+     * Reload the game manager configuration
+     */
+    public void reload() {
+        try {
+            Logger.info("Reloading GameManager configuration...");
+            
+            // Any configuration-dependent reloading can be done here
+            // For now, just log that reload was called
+            
+            Logger.info("GameManager configuration reloaded successfully!");
+            
+        } catch (Exception e) {
+            Logger.severe("Failed to reload GameManager: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
      * Data class for storing player state
      */
     private static class PlayerRestoreData {

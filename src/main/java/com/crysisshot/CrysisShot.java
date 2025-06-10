@@ -10,8 +10,9 @@ import com.crysisshot.game.GameManager;
 // TODO: Uncomment when implemented in later steps
 // import com.crysisshot.integration.EconomyManager;
 // import com.crysisshot.integration.PlaceholderExpansion;
-// import com.crysisshot.listeners.GameListener;
-// import com.crysisshot.listeners.PlayerListener;
+import com.crysisshot.listeners.CombatListener;
+import com.crysisshot.listeners.GameListener;
+import com.crysisshot.listeners.PlayerListener;
 import com.crysisshot.localization.MessageManager;
 import com.crysisshot.utils.Logger;
 import org.bukkit.Bukkit;
@@ -137,20 +138,21 @@ public class CrysisShot extends JavaPlugin {    private static CrysisShot instan
         getCommand("crysisshot").setTabCompleter(mainCommand);
         
         Logger.info("Commands registered successfully!");
-    }
-      /**
+    }    /**
      * Register event listeners
      */
     private void registerEvents() {
         Logger.info("Registering event listeners...");
         
-        // TODO: Implement in Step 2.1 when GameManager and listeners are implemented
-        // Bukkit.getPluginManager().registerEvents(
-        //     new PlayerListener(gameManager, messageManager), this);
-        // Bukkit.getPluginManager().registerEvents(
-        //     new GameListener(gameManager, messageManager), this);
+        // Register all event listeners
+        Bukkit.getPluginManager().registerEvents(
+            new PlayerListener(gameManager, messageManager), this);
+        Bukkit.getPluginManager().registerEvents(
+            new GameListener(gameManager, messageManager), this);
+        Bukkit.getPluginManager().registerEvents(
+            new CombatListener(this), this);
         
-        Logger.info("Event listeners will be registered in Step 2.1!");
+        Logger.info("Event listeners registered successfully!");
     }
       /**
      * Setup external plugin integrations
@@ -182,14 +184,12 @@ public class CrysisShot extends JavaPlugin {    private static CrysisShot instan
      */
     public void reloadPlugin() {
         try {            Logger.info("Reloading CrysisShot plugin...");
-            
-            // Reload configurations
+              // Reload configurations
             configManager.reloadConfig();
             messageManager.loadMessages();
             
-            // TODO: Implement in Step 2.1 when GameManager is available
             // Reinitialize game manager with new config
-            // gameManager.reload();
+            gameManager.reload();
             
             Logger.info("Plugin reloaded successfully!");
             
