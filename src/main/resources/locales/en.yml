@@ -247,13 +247,14 @@ messages:
     sword-kills: "<yellow>Sword Kills: <white>{kills}</white>"
     games-played: "<yellow>Games Played: <white>{games}</white>"
     games-won: "<yellow>Games Won: <white>{wins}</white>"
-    win-rate: "<yellow>Win Rate: <white>{rate}%</white>"
+    win-rate: "<yellow>Win Rate: <white>{rate}%</white>"    
     current-rank: "<yellow>Current Rank: {rank}"
     best-streak: "<yellow>Best Kill Streak: <white>{streak}</white>"
     
   # Leaderboard messages
-  leaderboard:
-    header: "<gold><bold>--- Top Players ---</bold></gold>"    entry: "<yellow>{position}.</yellow> {rank} <white>{player}</white> <gray>-</gray> <green>{score}</green>"
+  leaderboard:    
+    header: "<gold><bold>--- Top Players ---</bold></gold>"
+    entry: "<yellow>{position}.</yellow> {rank} <white>{player}</white> <gray>-</gray> <green>{score}</green>"
     footer: "<gray>Page {current}/{total}"
     
   # Error messages
